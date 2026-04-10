@@ -1,5 +1,7 @@
 mod app;
 mod presets;
+#[cfg(test)]
+mod tests;
 
 use app::App;
 use crossterm::event::{self, Event, KeyEventKind};
