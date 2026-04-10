@@ -1,11 +1,9 @@
 mod app;
-mod generator;
 mod presets;
-mod screens;
-mod ui;
 
 use app::App;
 use crossterm::event::{self, Event, KeyEventKind};
+use presets::ui;
 use std::io;
 
 fn main() -> io::Result<()> {
