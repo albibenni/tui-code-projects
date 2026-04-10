@@ -1,0 +1,8 @@
+[package]
+name = "new-project-tui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ratatui = "0.29"        # 0.30 splits into sub-crates (ratatui-core/widgets/crossterm) — API not stable yet
+crossterm = "0.28"     # must match what ratatui 0.29 depends on (0.28.1)
