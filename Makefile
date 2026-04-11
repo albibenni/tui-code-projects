@@ -1,4 +1,4 @@
-.PHONY: all build test coverage clean run help
+.PHONY: all build test coverage clean run check help
 
 all: build
 
@@ -10,6 +10,9 @@ release:
 
 run:
 	cargo run
+
+check:
+	cargo check 2>&1
 
 test:
 	cargo test
