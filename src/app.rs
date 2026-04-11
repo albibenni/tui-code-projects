@@ -1,4 +1,3 @@
-use crossterm::event::KeyEvent;
 use ratatui::widgets::ListState;
 
 use crate::presets::{Category, Language, get_languages};
@@ -50,7 +49,4 @@ impl App {
         }
     }
 
-    pub fn handle_key(&mut self, _key: KeyEvent) {
-        todo!()
-    }
 }
