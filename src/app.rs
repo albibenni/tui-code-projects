@@ -2,6 +2,8 @@ use ratatui::widgets::ListState;
 
 use crate::presets::{Category, Language, get_languages};
 
+
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Step {
     Category,
@@ -27,6 +29,13 @@ pub struct App {
 }
 
 impl App {
+    pub fn filtered_languages(&self) -> Vec<&Language> {
+        self.languages
+            .iter()
+            .filter(|l| Some(l.category) == self.selected_category)
+            .collect()
+    }
+
     pub fn new() -> Self {
         let mut category_state = ListState::default();
         category_state.select(Some(0));
