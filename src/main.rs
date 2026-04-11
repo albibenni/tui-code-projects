@@ -1,5 +1,6 @@
 mod app;
 mod presets;
+mod style;
 #[cfg(test)]
 mod tests;
 
