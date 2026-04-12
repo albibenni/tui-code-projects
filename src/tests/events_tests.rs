@@ -153,3 +153,67 @@ fn language_q_quits() {
     app.handle_key(press(KeyCode::Char('q')));
     assert!(app.should_quit);
 }
+
+// --- Preset step ---
+
+fn at_preset_step(category: Category, lang_index: usize) -> App {
+    let mut app = App::new();
+    app.selected_category = Some(category);
+    app.lang_state.select(Some(lang_index));
+    app.step = Step::Preset;
+    app.preset_state.select(Some(0));
+    app
+}
+
+#[test]
+fn preset_down_moves_selection_forward() {
+    let mut app = at_preset_step(Category::Backend, 0); // Rust
+    app.handle_key(press(KeyCode::Down));
+    assert_eq!(app.preset_state.selected(), Some(1));
+}
+
+#[test]
+fn preset_up_does_not_go_before_first() {
+    let mut app = at_preset_step(Category::Backend, 0);
+    app.handle_key(press(KeyCode::Up));
+    assert_eq!(app.preset_state.selected(), Some(0));
+}
+
+#[test]
+fn preset_down_does_not_go_past_last() {
+    let mut app = at_preset_step(Category::Backend, 0);
+    let last = app.selected_language().unwrap().presets.len() - 1;
+    for _ in 0..last + 5 {
+        app.handle_key(press(KeyCode::Down));
+    }
+    assert_eq!(app.preset_state.selected(), Some(last));
+}
+
+#[test]
+fn preset_enter_advances_to_config_step() {
+    let mut app = at_preset_step(Category::Backend, 0);
+    app.handle_key(press(KeyCode::Enter));
+    assert_eq!(app.step, Step::Config);
+}
+
+#[test]
+fn preset_esc_goes_back_to_language() {
+    let mut app = at_preset_step(Category::Backend, 0);
+    app.handle_key(press(KeyCode::Esc));
+    assert_eq!(app.step, Step::Language);
+    assert_eq!(app.preset_state.selected(), Some(0));
+}
+
+#[test]
+fn preset_b_goes_back_to_language() {
+    let mut app = at_preset_step(Category::Frontend, 0);
+    app.handle_key(press(KeyCode::Char('b')));
+    assert_eq!(app.step, Step::Language);
+}
+
+#[test]
+fn preset_q_quits() {
+    let mut app = at_preset_step(Category::Backend, 0);
+    app.handle_key(press(KeyCode::Char('q')));
+    assert!(app.should_quit);
+}
