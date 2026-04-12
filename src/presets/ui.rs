@@ -3,7 +3,7 @@ use crate::presets::Category;
 use crate::style::theme;
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::text::Span;
+use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, List, ListItem};
 
 pub fn draw(frame: &mut Frame, app: &mut App) {
@@ -100,8 +100,53 @@ fn draw_language(frame: &mut Frame, app: &mut App) {
     frame.render_stateful_widget(list, area, &mut app.lang_state);
 }
 
-fn draw_preset(_frame: &mut Frame, _app: &mut App) {
-    todo!()
+fn draw_preset(frame: &mut Frame, app: &mut App) {
+    let language = match app.selected_language() {
+        Some(l) => l,
+        None => return,
+    };
+
+    let count = language.presets.len();
+    let height = (count as u16 * 2 + 4).max(8);
+    let area = centered_rect(50, height, frame.area());
+
+    let category_label = app.selected_category.map(|c| c.label()).unwrap_or("");
+
+    let block = Block::bordered()
+        .border_type(BorderType::Rounded)
+        .border_style(theme::BORDER)
+        .title_top(Span::styled(
+            format!(" new-project — {} — {} ", category_label, language.name),
+            theme::TITLE,
+        ))
+        .title_bottom(
+            Line::from(Span::styled(
+                " ↑↓ navigate  enter select  b back  q quit ",
+                theme::HINT,
+            ))
+            .right_aligned(),
+        );
+
+    let items: Vec<ListItem> = language
+        .presets
+        .iter()
+        .map(|p| {
+            ListItem::new(Text::from(vec![
+                Line::from(Span::raw(format!(" {} ", p.name))),
+                Line::from(Span::styled(
+                    format!("   {} ", p.description),
+                    theme::UNSELECTED,
+                )),
+            ]))
+        })
+        .collect();
+
+    let list = List::new(items)
+        .block(block)
+        .highlight_style(theme::SELECTED)
+        .highlight_symbol("> ");
+
+    frame.render_stateful_widget(list, area, &mut app.preset_state);
 }
 
 fn draw_config(_frame: &mut Frame, _app: &mut App) {
