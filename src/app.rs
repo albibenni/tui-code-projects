@@ -36,6 +36,11 @@ impl App {
             .collect()
     }
 
+    pub fn selected_language(&self) -> Option<&Language> {
+        let i = self.lang_state.selected()?;
+        self.filtered_languages().into_iter().nth(i)
+    }
+
     pub fn new() -> Self {
         let mut category_state = ListState::default();
         category_state.select(Some(0));
