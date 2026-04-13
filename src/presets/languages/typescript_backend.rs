@@ -1,5 +1,41 @@
-use super::shared::{pm_bun, pm_deno, pm_node};
+use super::shared::eslint_backend_step;
 use super::types::{Category, Choice, Language, OptionStep};
+
+fn pm_node_backend() -> OptionStep {
+    let eslint = eslint_backend_step();
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "npm",  description: "Default Node.js package manager",      follow_up: vec![eslint.clone()] },
+            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![eslint.clone()] },
+            Choice { name: "yarn", description: "Reliable JavaScript package manager",  follow_up: vec![eslint] },
+        ],
+    }
+}
+
+fn pm_bun_backend() -> OptionStep {
+    let eslint = eslint_backend_step();
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "bun",  description: "Bun's built-in package manager",       follow_up: vec![eslint.clone()] },
+            Choice { name: "npm",  description: "Node.js package manager",              follow_up: vec![eslint.clone()] },
+            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![eslint] },
+        ],
+    }
+}
+
+fn pm_deno_backend() -> OptionStep {
+    let eslint = eslint_backend_step();
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "deno", description: "Deno's built-in package manager",      follow_up: vec![eslint.clone()] },
+            Choice { name: "npm",  description: "Node.js package manager",              follow_up: vec![eslint.clone()] },
+            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![eslint] },
+        ],
+    }
+}
 
 pub fn typescript_backend_language() -> Language {
     Language {
@@ -14,10 +50,10 @@ pub fn typescript_backend_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Framework",
                         choices: vec![
-                            Choice { name: "Express", description: "Minimal and flexible web framework",  follow_up: vec![pm_node()] },
-                            Choice { name: "Fastify", description: "Fast and low-overhead web framework", follow_up: vec![pm_node()] },
-                            Choice { name: "NestJS",  description: "Progressive Node.js framework",       follow_up: vec![pm_node()] },
-                            Choice { name: "Hono",    description: "Ultrafast web framework",             follow_up: vec![pm_node()] },
+                            Choice { name: "Express", description: "Minimal and flexible web framework",  follow_up: vec![pm_node_backend()] },
+                            Choice { name: "Fastify", description: "Fast and low-overhead web framework", follow_up: vec![pm_node_backend()] },
+                            Choice { name: "NestJS",  description: "Progressive Node.js framework",       follow_up: vec![pm_node_backend()] },
+                            Choice { name: "Hono",    description: "Ultrafast web framework",             follow_up: vec![pm_node_backend()] },
                         ],
                     }],
                 },
@@ -27,9 +63,9 @@ pub fn typescript_backend_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Framework",
                         choices: vec![
-                            Choice { name: "Hono",    description: "Ultrafast web framework",             follow_up: vec![pm_bun()] },
-                            Choice { name: "Elysia",  description: "Ergonomic framework for Bun",         follow_up: vec![pm_bun()] },
-                            Choice { name: "Express", description: "Minimal and flexible web framework",  follow_up: vec![pm_bun()] },
+                            Choice { name: "Hono",    description: "Ultrafast web framework",             follow_up: vec![pm_bun_backend()] },
+                            Choice { name: "Elysia",  description: "Ergonomic framework for Bun",         follow_up: vec![pm_bun_backend()] },
+                            Choice { name: "Express", description: "Minimal and flexible web framework",  follow_up: vec![pm_bun_backend()] },
                         ],
                     }],
                 },
@@ -39,9 +75,9 @@ pub fn typescript_backend_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Framework",
                         choices: vec![
-                            Choice { name: "Fresh", description: "Next-gen web framework for Deno",       follow_up: vec![pm_deno()] },
-                            Choice { name: "Oak",   description: "Middleware framework inspired by Koa",  follow_up: vec![pm_deno()] },
-                            Choice { name: "Hono",  description: "Ultrafast web framework",               follow_up: vec![pm_deno()] },
+                            Choice { name: "Fresh", description: "Next-gen web framework for Deno",       follow_up: vec![pm_deno_backend()] },
+                            Choice { name: "Oak",   description: "Middleware framework inspired by Koa",  follow_up: vec![pm_deno_backend()] },
+                            Choice { name: "Hono",  description: "Ultrafast web framework",               follow_up: vec![pm_deno_backend()] },
                         ],
                     }],
                 },

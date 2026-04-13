@@ -54,3 +54,31 @@ pub fn pm_python() -> OptionStep {
         ],
     }
 }
+
+pub fn eslint_backend_step() -> OptionStep {
+    OptionStep {
+        title: "ESLint",
+        choices: vec![
+            Choice {
+                name: "None",
+                description: "Skip ESLint",
+                follow_up: vec![],
+            },
+            Choice {
+                name: "Recommended",
+                description: "typescript-eslint recommended, flat config (eslint.config.js)",
+                follow_up: vec![],
+            },
+            Choice {
+                name: "Recommended + Prettier",
+                description: "Recommended + eslint-plugin-prettier, flat config",
+                follow_up: vec![],
+            },
+            Choice {
+                name: "Custom Strict",
+                description: "Full preset: eslint.config.js + tsconfig.json + .prettierrc",
+                follow_up: vec![],
+            },
+        ],
+    }
+}
