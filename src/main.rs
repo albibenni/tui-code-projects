@@ -2,6 +2,7 @@ mod app;
 mod config;
 mod events;
 mod presets;
+mod scaffold;
 mod style;
 #[cfg(test)]
 mod tests;
