@@ -1,0 +1,56 @@
+use super::types::{Choice, OptionStep};
+
+pub fn pm_node() -> OptionStep {
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "npm",  description: "Default Node.js package manager",      follow_up: vec![] },
+            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![] },
+            Choice { name: "yarn", description: "Reliable JavaScript package manager",  follow_up: vec![] },
+        ],
+    }
+}
+
+pub fn pm_bun() -> OptionStep {
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "bun",  description: "Bun's built-in package manager",       follow_up: vec![] },
+            Choice { name: "npm",  description: "Node.js package manager",              follow_up: vec![] },
+            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![] },
+        ],
+    }
+}
+
+pub fn pm_deno() -> OptionStep {
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "deno", description: "Deno's built-in package manager",      follow_up: vec![] },
+            Choice { name: "npm",  description: "Node.js package manager",              follow_up: vec![] },
+            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![] },
+        ],
+    }
+}
+
+pub fn pm_js() -> OptionStep {
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "npm",  description: "Default Node.js package manager",      follow_up: vec![] },
+            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![] },
+            Choice { name: "bun",  description: "Fast JavaScript all-in-one toolkit",   follow_up: vec![] },
+        ],
+    }
+}
+
+pub fn pm_python() -> OptionStep {
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice { name: "pip",    description: "Standard Python package manager",     follow_up: vec![] },
+            Choice { name: "poetry", description: "Dependency management and packaging", follow_up: vec![] },
+            Choice { name: "uv",     description: "Fast Python package installer",       follow_up: vec![] },
+        ],
+    }
+}
