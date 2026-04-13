@@ -16,3 +16,7 @@ pub const TITLE: Style = Style::new()
 pub const HINT: Style = Style::new()
     .fg(Color::DarkGray)
     .add_modifier(Modifier::DIM);
+
+pub const ERROR: Style = Style::new()
+    .fg(Color::Red)
+    .add_modifier(Modifier::BOLD);
