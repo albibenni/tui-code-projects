@@ -10,10 +10,10 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     match app.step {
         Step::Category => draw_category(frame, app),
         Step::Language => draw_language(frame, app),
-        Step::Preset => draw_preset(frame, app),
-        Step::Config => draw_config(frame, app),
-        Step::Confirm => draw_confirm(frame, app),
-        Step::Done => draw_done(frame, app),
+        Step::Options  => draw_options(frame, app),
+        Step::Config   => draw_config(frame, app),
+        Step::Confirm  => draw_confirm(frame, app),
+        Step::Done     => draw_done(frame, app),
     }
 }
 
@@ -41,7 +41,7 @@ fn draw_category(frame: &mut Frame, app: &mut App) {
         .border_style(theme::BORDER)
         .title_top(Span::styled(" new-project ", theme::TITLE))
         .title_bottom(
-            ratatui::text::Line::from(Span::styled(
+            Line::from(Span::styled(
                 " ↑↓ navigate  enter select  q quit ",
                 theme::HINT,
             ))
@@ -80,7 +80,7 @@ fn draw_language(frame: &mut Frame, app: &mut App) {
             theme::TITLE,
         ))
         .title_bottom(
-            ratatui::text::Line::from(Span::styled(
+            Line::from(Span::styled(
                 " ↑↓ navigate  enter select  b back  q quit ",
                 theme::HINT,
             ))
@@ -100,23 +100,25 @@ fn draw_language(frame: &mut Frame, app: &mut App) {
     frame.render_stateful_widget(list, area, &mut app.lang_state);
 }
 
-fn draw_preset(frame: &mut Frame, app: &mut App) {
-    let language = match app.selected_language() {
-        Some(l) => l,
+fn draw_options(frame: &mut Frame, app: &mut App) {
+    let option_step = match app.current_option_step() {
+        Some(s) => s,
         None => return,
     };
 
-    let count = language.presets.len();
+    let count = option_step.choices.len();
     let height = (count as u16 * 2 + 4).max(8);
-    let area = centered_rect(50, height, frame.area());
+    let area = centered_rect(56, height, frame.area());
 
     let category_label = app.selected_category.map(|c| c.label()).unwrap_or("");
+    let lang_name = app.selected_language().map(|l| l.name).unwrap_or("");
+    let step_title = option_step.title;
 
     let block = Block::bordered()
         .border_type(BorderType::Rounded)
         .border_style(theme::BORDER)
         .title_top(Span::styled(
-            format!(" new-project — {} — {} ", category_label, language.name),
+            format!(" new-project — {} — {} — {} ", category_label, lang_name, step_title),
             theme::TITLE,
         ))
         .title_bottom(
@@ -127,14 +129,14 @@ fn draw_preset(frame: &mut Frame, app: &mut App) {
             .right_aligned(),
         );
 
-    let items: Vec<ListItem> = language
-        .presets
+    let items: Vec<ListItem> = option_step
+        .choices
         .iter()
-        .map(|p| {
+        .map(|c| {
             ListItem::new(Text::from(vec![
-                Line::from(Span::raw(format!(" {} ", p.name))),
+                Line::from(Span::raw(format!(" {} ", c.name))),
                 Line::from(Span::styled(
-                    format!("   {} ", p.description),
+                    format!("   {} ", c.description),
                     theme::UNSELECTED,
                 )),
             ]))
@@ -146,7 +148,7 @@ fn draw_preset(frame: &mut Frame, app: &mut App) {
         .highlight_style(theme::SELECTED)
         .highlight_symbol("> ");
 
-    frame.render_stateful_widget(list, area, &mut app.preset_state);
+    frame.render_stateful_widget(list, area, &mut app.option_list_state);
 }
 
 fn draw_config(_frame: &mut Frame, _app: &mut App) {
