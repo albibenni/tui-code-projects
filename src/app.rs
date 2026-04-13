@@ -1,5 +1,6 @@
 use ratatui::widgets::ListState;
 
+use crate::config::ConfigState;
 use crate::presets::{Category, Language, OptionStep, get_languages};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -34,10 +35,9 @@ pub struct App {
     pub option_selections: Vec<OptionSelection>,
     pub option_list_state: ListState,
     // Config step
-    pub project_name: String,
-    pub project_path: String,
+    pub config: ConfigState,
+    // Done step
     pub result_message: String,
-    pub error_message: Option<String>,
 }
 
 impl App {
@@ -59,10 +59,8 @@ impl App {
             option_step_index: 0,
             option_selections: Vec::new(),
             option_list_state,
-            project_name: String::new(),
-            project_path: String::from("./"),
+            config: ConfigState::new(),
             result_message: String::new(),
-            error_message: None,
         }
     }
 

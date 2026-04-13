@@ -1,4 +1,5 @@
 mod app;
+mod config;
 mod events;
 mod presets;
 mod style;
