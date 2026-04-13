@@ -13,11 +13,11 @@ pub fn draw(frame: &mut Frame, app: &App) {
 
     lines.push(Line::from(""));
     lines.push(Line::from(vec![
-        Span::styled("  Category    ", theme::HINT),
+        Span::styled(format!("  {:<16}", "Category"), theme::HINT),
         Span::styled(category_label, theme::SELECTED),
     ]));
     lines.push(Line::from(vec![
-        Span::styled("  Language    ", theme::HINT),
+        Span::styled(format!("  {:<16}", "Language"), theme::HINT),
         Span::styled(lang_name, theme::SELECTED),
     ]));
 
@@ -25,7 +25,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
         lines.push(Line::from(""));
         for sel in &app.option_selections {
             lines.push(Line::from(vec![
-                Span::styled(format!("  {:<14}", sel.title), theme::HINT),
+                Span::styled(format!("  {:<16}", sel.title), theme::HINT),
                 Span::styled(sel.choice_name, theme::SELECTED),
             ]));
         }
@@ -33,11 +33,11 @@ pub fn draw(frame: &mut Frame, app: &App) {
 
     lines.push(Line::from(""));
     lines.push(Line::from(vec![
-        Span::styled("  Name        ", theme::HINT),
+        Span::styled(format!("  {:<16}", "Name"), theme::HINT),
         Span::styled(app.config.project_name.as_str(), theme::SELECTED),
     ]));
     lines.push(Line::from(vec![
-        Span::styled("  Path        ", theme::HINT),
+        Span::styled(format!("  {:<16}", "Path"), theme::HINT),
         Span::styled(app.config.project_path.as_str(), theme::SELECTED),
     ]));
     lines.push(Line::from(""));
