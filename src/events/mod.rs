@@ -1,4 +1,5 @@
 mod category;
+mod confirm;
 mod config;
 mod language;
 mod options;
@@ -36,6 +37,7 @@ impl App {
             Step::Language => self.handle_language(key),
             Step::Options  => self.handle_options(key),
             Step::Config   => self.handle_config(key),
+            Step::Confirm  => self.handle_confirm(key),
             _              => {}
         }
     }
