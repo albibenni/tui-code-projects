@@ -16,8 +16,13 @@ impl App {
                 self.lang_state.select(Some(prev.saturating_sub(1)));
             }
             NavAction::Confirm => {
-                self.preset_state.select(Some(0));
-                self.step = Step::Preset;
+                if let Some(lang) = self.selected_language() {
+                    self.option_steps = lang.steps.clone();
+                    self.option_step_index = 0;
+                    self.option_selections.clear();
+                    self.option_list_state.select(Some(0));
+                    self.step = Step::Options;
+                }
             }
             NavAction::Back => {
                 self.lang_state.select(Some(0));

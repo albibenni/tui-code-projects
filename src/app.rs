@@ -1,27 +1,39 @@
 use ratatui::widgets::ListState;
 
-use crate::presets::{Category, Language, get_languages};
-
-
+use crate::presets::{Category, Language, OptionStep, get_languages};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Step {
     Category,
     Language,
-    Preset,
+    Options,
     Config,
     Confirm,
     Done,
 }
 
+pub struct OptionSelection {
+    pub title: &'static str,
+    pub choice_name: &'static str,
+    pub choice_index: usize,
+    pub follow_up_count: usize,
+}
+
 pub struct App {
     pub step: Step,
     pub should_quit: bool,
+    // Category step
     pub category_state: ListState,
     pub selected_category: Option<Category>,
+    // Language step
     pub languages: Vec<Language>,
     pub lang_state: ListState,
-    pub preset_state: ListState,
+    // Options step
+    pub option_steps: Vec<OptionStep>,
+    pub option_step_index: usize,
+    pub option_selections: Vec<OptionSelection>,
+    pub option_list_state: ListState,
+    // Config step
     pub project_name: String,
     pub project_path: String,
     pub result_message: String,
@@ -29,6 +41,31 @@ pub struct App {
 }
 
 impl App {
+    pub fn new() -> Self {
+        let mut category_state = ListState::default();
+        category_state.select(Some(0));
+        let mut lang_state = ListState::default();
+        lang_state.select(Some(0));
+        let mut option_list_state = ListState::default();
+        option_list_state.select(Some(0));
+        App {
+            step: Step::Category,
+            should_quit: false,
+            category_state,
+            selected_category: None,
+            languages: get_languages(),
+            lang_state,
+            option_steps: Vec::new(),
+            option_step_index: 0,
+            option_selections: Vec::new(),
+            option_list_state,
+            project_name: String::new(),
+            project_path: String::from("./"),
+            result_message: String::new(),
+            error_message: None,
+        }
+    }
+
     pub fn filtered_languages(&self) -> Vec<&Language> {
         self.languages
             .iter()
@@ -41,26 +78,7 @@ impl App {
         self.filtered_languages().into_iter().nth(i)
     }
 
-    pub fn new() -> Self {
-        let mut category_state = ListState::default();
-        category_state.select(Some(0));
-        let mut lang_state = ListState::default();
-        lang_state.select(Some(0));
-        let mut preset_state = ListState::default();
-        preset_state.select(Some(0));
-        App {
-            step: Step::Category,
-            should_quit: false,
-            category_state,
-            selected_category: None,
-            languages: get_languages(),
-            lang_state,
-            preset_state,
-            project_name: String::new(),
-            project_path: String::from("./"),
-            result_message: String::new(),
-            error_message: None,
-        }
+    pub fn current_option_step(&self) -> Option<&OptionStep> {
+        self.option_steps.get(self.option_step_index)
     }
-
 }

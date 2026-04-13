@@ -1,6 +1,6 @@
 mod category;
 mod language;
-mod preset;
+mod options;
 
 use crossterm::event::{KeyCode, KeyEvent};
 
@@ -33,7 +33,7 @@ impl App {
         match self.step {
             Step::Category => self.handle_category(key),
             Step::Language => self.handle_language(key),
-            Step::Preset   => self.handle_preset(key),
+            Step::Options  => self.handle_options(key),
             _              => {}
         }
     }
