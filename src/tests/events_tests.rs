@@ -12,6 +12,8 @@ fn press(code: KeyCode) -> KeyEvent {
     }
 }
 
+// ── Category step ─────────────────────────────────────────────────────────────
+
 #[test]
 fn down_moves_selection_forward() {
     let mut app = App::new();
@@ -90,7 +92,7 @@ fn esc_quits() {
     assert!(app.should_quit);
 }
 
-// --- Language step ---
+// ── Language step ─────────────────────────────────────────────────────────────
 
 fn at_language_step(category: Category) -> App {
     let mut app = App::new();
@@ -125,11 +127,19 @@ fn language_down_does_not_go_past_last() {
 }
 
 #[test]
-fn language_enter_advances_to_preset_step() {
+fn language_enter_advances_to_options_step() {
     let mut app = at_language_step(Category::Backend);
     app.handle_key(press(KeyCode::Enter));
-    assert_eq!(app.step, Step::Preset);
-    assert_eq!(app.preset_state.selected(), Some(0));
+    assert_eq!(app.step, Step::Options);
+    assert_eq!(app.option_list_state.selected(), Some(0));
+    assert!(!app.option_steps.is_empty());
+}
+
+#[test]
+fn language_enter_loads_option_steps_for_language() {
+    let mut app = at_language_step(Category::Backend);
+    app.handle_key(press(KeyCode::Enter)); // selects Rust
+    assert_eq!(app.option_steps[0].title, "Project Type");
 }
 
 #[test]
@@ -154,66 +164,85 @@ fn language_q_quits() {
     assert!(app.should_quit);
 }
 
-// --- Preset step ---
+// ── Options step ──────────────────────────────────────────────────────────────
 
-fn at_preset_step(category: Category, lang_index: usize) -> App {
+fn at_options_step(category: Category, lang_index: usize) -> App {
     let mut app = App::new();
     app.selected_category = Some(category);
     app.lang_state.select(Some(lang_index));
-    app.step = Step::Preset;
-    app.preset_state.select(Some(0));
+    let steps = app.selected_language().unwrap().steps.clone();
+    app.option_steps = steps;
+    app.option_step_index = 0;
+    app.option_list_state.select(Some(0));
+    app.step = Step::Options;
     app
 }
 
 #[test]
-fn preset_down_moves_selection_forward() {
-    let mut app = at_preset_step(Category::Backend, 0); // Rust
+fn options_down_moves_selection_forward() {
+    let mut app = at_options_step(Category::Backend, 0); // Rust
     app.handle_key(press(KeyCode::Down));
-    assert_eq!(app.preset_state.selected(), Some(1));
+    assert_eq!(app.option_list_state.selected(), Some(1));
 }
 
 #[test]
-fn preset_up_does_not_go_before_first() {
-    let mut app = at_preset_step(Category::Backend, 0);
+fn options_up_does_not_go_before_first() {
+    let mut app = at_options_step(Category::Backend, 0);
     app.handle_key(press(KeyCode::Up));
-    assert_eq!(app.preset_state.selected(), Some(0));
+    assert_eq!(app.option_list_state.selected(), Some(0));
 }
 
 #[test]
-fn preset_down_does_not_go_past_last() {
-    let mut app = at_preset_step(Category::Backend, 0);
-    let last = app.selected_language().unwrap().presets.len() - 1;
+fn options_down_does_not_go_past_last() {
+    let mut app = at_options_step(Category::Backend, 0);
+    let last = app.current_option_step().unwrap().choices.len() - 1;
     for _ in 0..last + 5 {
         app.handle_key(press(KeyCode::Down));
     }
-    assert_eq!(app.preset_state.selected(), Some(last));
+    assert_eq!(app.option_list_state.selected(), Some(last));
 }
 
 #[test]
-fn preset_enter_advances_to_config_step() {
-    let mut app = at_preset_step(Category::Backend, 0);
+fn options_enter_on_leaf_advances_to_config() {
+    let mut app = at_options_step(Category::Backend, 0); // Rust — Binary has no follow_up
+    app.option_list_state.select(Some(0)); // Binary
     app.handle_key(press(KeyCode::Enter));
     assert_eq!(app.step, Step::Config);
 }
 
 #[test]
-fn preset_esc_goes_back_to_language() {
-    let mut app = at_preset_step(Category::Backend, 0);
+fn options_enter_on_choice_with_follow_up_stays_in_options() {
+    let mut app = at_options_step(Category::Backend, 0); // Rust
+    app.option_list_state.select(Some(2)); // Web API — has follow_up Framework step
+    app.handle_key(press(KeyCode::Enter));
+    assert_eq!(app.step, Step::Options);
+    assert_eq!(app.option_steps.len(), 2);
+    assert_eq!(app.option_step_index, 1);
+    assert_eq!(app.option_steps[1].title, "Framework");
+}
+
+#[test]
+fn options_back_from_first_step_goes_to_language() {
+    let mut app = at_options_step(Category::Backend, 0);
     app.handle_key(press(KeyCode::Esc));
     assert_eq!(app.step, Step::Language);
-    assert_eq!(app.preset_state.selected(), Some(0));
+    assert!(app.option_steps.is_empty());
 }
 
 #[test]
-fn preset_b_goes_back_to_language() {
-    let mut app = at_preset_step(Category::Frontend, 0);
-    app.handle_key(press(KeyCode::Char('b')));
-    assert_eq!(app.step, Step::Language);
+fn options_back_restores_previous_selection_and_removes_follow_up() {
+    let mut app = at_options_step(Category::Backend, 0); // Rust
+    app.option_list_state.select(Some(2)); // Web API
+    app.handle_key(press(KeyCode::Enter)); // now at Framework step
+    app.handle_key(press(KeyCode::Esc));   // go back
+    assert_eq!(app.option_step_index, 0);
+    assert_eq!(app.option_list_state.selected(), Some(2)); // restored
+    assert_eq!(app.option_steps.len(), 1); // follow_up removed
 }
 
 #[test]
-fn preset_q_quits() {
-    let mut app = at_preset_step(Category::Backend, 0);
+fn options_q_quits() {
+    let mut app = at_options_step(Category::Backend, 0);
     app.handle_key(press(KeyCode::Char('q')));
     assert!(app.should_quit);
 }

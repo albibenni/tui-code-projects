@@ -1,9 +1,23 @@
 use crate::presets::{Category, get_languages};
 
 #[test]
-fn all_languages_have_at_least_one_preset() {
+fn all_languages_have_at_least_one_step() {
     for lang in get_languages() {
-        assert!(!lang.presets.is_empty(), "{} has no presets", lang.name);
+        assert!(!lang.steps.is_empty(), "{} has no steps", lang.name);
+    }
+}
+
+#[test]
+fn all_steps_have_at_least_one_choice() {
+    for lang in get_languages() {
+        for step in &lang.steps {
+            assert!(
+                !step.choices.is_empty(),
+                "{} — step '{}' has no choices",
+                lang.name,
+                step.title
+            );
+        }
     }
 }
 
