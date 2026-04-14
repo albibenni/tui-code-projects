@@ -18,10 +18,10 @@ fn at_confirm_step() -> App {
 }
 
 #[test]
-fn enter_advances_to_done() {
+fn enter_advances_to_running() {
     let mut app = at_confirm_step();
     app.handle_key(press(KeyCode::Enter));
-    assert_eq!(app.step, Step::Done);
+    assert_eq!(app.step, Step::Running);
 }
 
 #[test]
