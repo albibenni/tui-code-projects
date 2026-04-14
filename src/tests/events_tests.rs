@@ -79,17 +79,17 @@ fn enter_on_second_item_selects_frontend() {
 }
 
 #[test]
-fn q_quits() {
+fn q_shows_quit_confirm() {
     let mut app = App::new();
     app.handle_key(press(KeyCode::Char('q')));
-    assert!(app.should_quit);
+    assert!(app.show_quit_confirm);
 }
 
 #[test]
-fn esc_quits() {
+fn esc_shows_quit_confirm() {
     let mut app = App::new();
     app.handle_key(press(KeyCode::Esc));
-    assert!(app.should_quit);
+    assert!(app.show_quit_confirm);
 }
 
 // ── Language step ─────────────────────────────────────────────────────────────
@@ -158,10 +158,10 @@ fn language_b_goes_back_to_category() {
 }
 
 #[test]
-fn language_q_quits() {
+fn language_q_shows_quit_confirm() {
     let mut app = at_language_step(Category::Backend);
     app.handle_key(press(KeyCode::Char('q')));
-    assert!(app.should_quit);
+    assert!(app.show_quit_confirm);
 }
 
 // ── Options step ──────────────────────────────────────────────────────────────
@@ -241,8 +241,8 @@ fn options_back_restores_previous_selection_and_removes_follow_up() {
 }
 
 #[test]
-fn options_q_quits() {
+fn options_q_shows_quit_confirm() {
     let mut app = at_options_step(Category::Backend, 0);
     app.handle_key(press(KeyCode::Char('q')));
-    assert!(app.should_quit);
+    assert!(app.show_quit_confirm);
 }

@@ -26,6 +26,7 @@ pub struct OptionSelection {
 pub struct App {
     pub step: Step,
     pub should_quit: bool,
+    pub show_quit_confirm: bool,
     // Category step
     pub category_state: ListState,
     pub selected_category: Option<Category>,
@@ -58,6 +59,7 @@ impl App {
         App {
             step: Step::Category,
             should_quit: false,
+            show_quit_confirm: false,
             category_state,
             selected_category: None,
             languages: get_languages(),

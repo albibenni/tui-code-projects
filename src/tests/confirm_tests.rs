@@ -39,10 +39,10 @@ fn b_goes_back_to_config() {
 }
 
 #[test]
-fn q_quits() {
+fn q_shows_quit_confirm() {
     let mut app = at_confirm_step();
     app.handle_key(press(KeyCode::Char('q')));
-    assert!(app.should_quit);
+    assert!(app.show_quit_confirm);
 }
 
 #[test]
