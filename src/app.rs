@@ -1,3 +1,5 @@
+use std::sync::mpsc::Receiver;
+
 use ratatui::widgets::ListState;
 
 use crate::config::ConfigState;
@@ -10,6 +12,7 @@ pub enum Step {
     Options,
     Config,
     Confirm,
+    Running,
     Done,
 }
 
@@ -36,6 +39,10 @@ pub struct App {
     pub option_list_state: ListState,
     // Config step
     pub config: ConfigState,
+    // Running step
+    pub scaffold_rx: Option<Receiver<String>>,
+    pub output_lines: Vec<String>,
+    pub scaffold_done: bool,
     // Done step
     pub result_message: String,
 }
@@ -60,6 +67,9 @@ impl App {
             option_selections: Vec::new(),
             option_list_state,
             config: ConfigState::new(),
+            scaffold_rx: None,
+            output_lines: Vec::new(),
+            scaffold_done: false,
             result_message: String::new(),
         }
     }

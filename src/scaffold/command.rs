@@ -1,12 +1,41 @@
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::sync::mpsc::Sender;
+use std::thread;
 
-pub fn run_in(dir: &PathBuf, program: &str, args: &[&str]) -> Result<(), String> {
-    let status = Command::new(program)
+pub fn run_in(dir: &PathBuf, program: &str, args: &[&str], tx: &Sender<String>) -> Result<(), String> {
+    let mut child = Command::new(program)
         .args(args)
         .current_dir(dir)
-        .status()
-        .map_err(|e| format!("Failed to run `{program}`: {e}"))?;
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|e| format!("Failed to start `{program}`: {e}"))?;
+
+    let stdout = child.stdout.take().expect("stdout piped");
+    let stderr = child.stderr.take().expect("stderr piped");
+
+    let tx_out = tx.clone();
+    let tx_err = tx.clone();
+
+    let t_out = thread::spawn(move || {
+        for line in BufReader::new(stdout).lines().flatten() {
+            let _ = tx_out.send(line);
+        }
+    });
+    let t_err = thread::spawn(move || {
+        for line in BufReader::new(stderr).lines().flatten() {
+            let _ = tx_err.send(line);
+        }
+    });
+
+    t_out.join().ok();
+    t_err.join().ok();
+
+    let status = child
+        .wait()
+        .map_err(|e| format!("Failed to wait for `{program}`: {e}"))?;
 
     if status.success() {
         Ok(())

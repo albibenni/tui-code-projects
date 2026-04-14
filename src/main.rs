@@ -7,6 +7,9 @@ mod style;
 #[cfg(test)]
 mod tests;
 
+use std::sync::mpsc::TryRecvError;
+use std::time::Duration;
+
 use app::App;
 use crossterm::event::{self, Event, KeyEventKind};
 use presets::ui;
@@ -21,13 +24,45 @@ fn main() -> io::Result<()> {
 
 fn run(terminal: &mut ratatui::DefaultTerminal) -> io::Result<()> {
     let mut app = App::new();
+
     while !app.should_quit {
         terminal.draw(|frame| ui::draw(frame, &mut app))?;
-        if let Event::Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press {
-                app.handle_key(key);
+
+        if event::poll(Duration::from_millis(16))? {
+            if let Event::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press {
+                    app.handle_key(key);
+                }
+            }
+        }
+
+        drain_scaffold(&mut app);
+    }
+
+    Ok(())
+}
+
+fn drain_scaffold(app: &mut App) {
+    if app.scaffold_rx.is_none() {
+        return;
+    }
+
+    loop {
+        match app.scaffold_rx.as_ref().unwrap().try_recv() {
+            Ok(line) => {
+                app.output_lines.push(line);
+            }
+            Err(TryRecvError::Empty) => break,
+            Err(TryRecvError::Disconnected) => {
+                app.scaffold_done = true;
+                app.result_message = app
+                    .output_lines
+                    .last()
+                    .cloned()
+                    .unwrap_or_else(|| "Done".to_string());
+                app.scaffold_rx = None;
+                break;
             }
         }
     }
-    Ok(())
 }

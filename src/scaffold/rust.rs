@@ -1,20 +1,17 @@
 use std::path::PathBuf;
-
-use crate::app::App;
+use std::sync::mpsc::Sender;
 
 use super::command::run_in;
+use super::params::ScaffoldParams;
 
-pub fn scaffold(app: &App, base: &PathBuf) -> Result<(), String> {
-    let project_type = app
-        .option_selections
-        .iter()
-        .find(|s| s.title == "Project Type")
-        .map(|s| s.choice_name)
-        .unwrap_or("Binary");
+pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+    let project_type = params.sel("Project Type").unwrap_or("Binary");
 
     if project_type == "Library" {
-        run_in(base, "cargo", &["init", "--lib"])
+        let _ = tx.send("Running cargo init --lib...".to_string());
+        run_in(base, "cargo", &["init", "--lib"], tx)
     } else {
-        run_in(base, "cargo", &["init"])
+        let _ = tx.send("Running cargo init...".to_string());
+        run_in(base, "cargo", &["init"], tx)
     }
 }

@@ -4,6 +4,7 @@ mod config;
 mod done;
 mod language;
 mod options;
+mod running;
 
 use crossterm::event::{KeyCode, KeyEvent};
 
@@ -39,6 +40,7 @@ impl App {
             Step::Options  => self.handle_options(key),
             Step::Config   => self.handle_config(key),
             Step::Confirm  => self.handle_confirm(key),
+            Step::Running  => self.handle_running(key),
             Step::Done     => self.handle_done(key),
         }
     }

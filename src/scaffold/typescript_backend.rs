@@ -1,29 +1,34 @@
 use std::path::PathBuf;
-
-use crate::app::App;
+use std::sync::mpsc::Sender;
 
 use super::command::run_in;
+use super::params::ScaffoldParams;
 use super::writer;
 
-pub fn scaffold(app: &App, base: &PathBuf) -> Result<(), String> {
-    let runtime  = sel(app, "Runtime").unwrap_or("Node");
-    let framework = sel(app, "Framework").unwrap_or("");
-    let pm       = sel(app, "Package Manager").unwrap_or("npm");
-    let eslint   = sel(app, "ESLint").unwrap_or("None");
+pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+    let runtime   = params.sel("Runtime").unwrap_or("Node");
+    let framework = params.sel("Framework").unwrap_or("");
+    let pm        = params.sel("Package Manager").unwrap_or("npm");
+    let eslint    = params.sel("ESLint").unwrap_or("None");
 
     if runtime == "Deno" {
-        scaffold_deno(app, base, framework)
+        scaffold_deno(params, base, framework, tx)
     } else {
-        scaffold_node_bun(app, base, framework, pm, eslint)
+        scaffold_node_bun(params, base, framework, pm, eslint, tx)
     }
 }
 
-fn scaffold_deno(app: &App, base: &PathBuf, framework: &str) -> Result<(), String> {
+fn scaffold_deno(
+    params: &ScaffoldParams,
+    base: &PathBuf,
+    framework: &str,
+    tx: &Sender<String>,
+) -> Result<(), String> {
     let imports = match framework {
-        "Oak"  => "\n    \"oak\": \"jsr:@oak/oak\"",
+        "Oak"   => "\n    \"oak\": \"jsr:@oak/oak\"",
         "Fresh" => "\n    \"$fresh/\": \"jsr:@fresh/fresh/\"",
-        "Hono" => "\n    \"hono\": \"jsr:@hono/hono\"",
-        _      => "",
+        "Hono"  => "\n    \"hono\": \"jsr:@hono/hono\"",
+        _       => "",
     };
 
     let deno_json = format!(
@@ -38,20 +43,22 @@ fn scaffold_deno(app: &App, base: &PathBuf, framework: &str) -> Result<(), Strin
   }}
 }}
 "#,
-        app.config.project_name
+        params.project_name
     );
 
+    send(tx, "Writing deno.json...");
     writer::write_file(base, "deno.json", &deno_json)
 }
 
 fn scaffold_node_bun(
-    app: &App,
+    params: &ScaffoldParams,
     base: &PathBuf,
     framework: &str,
     pm: &str,
     eslint: &str,
+    tx: &Sender<String>,
 ) -> Result<(), String> {
-    let name = &app.config.project_name;
+    let name = &params.project_name;
 
     let mut deps: Vec<&str>     = Vec::new();
     let mut dev_deps: Vec<&str> = Vec::new();
@@ -61,22 +68,14 @@ fn scaffold_node_bun(
             deps.push("express");
             dev_deps.push("@types/express");
         }
-        "Fastify" => {
-            deps.push("fastify");
-        }
-        "NestJS" => {
-            deps.extend_from_slice(&[
-                "@nestjs/core",
-                "@nestjs/common",
-                "rxjs",
-                "reflect-metadata",
-            ]);
+        "Fastify" => { deps.push("fastify"); }
+        "NestJS"  => {
+            deps.extend_from_slice(&["@nestjs/core", "@nestjs/common", "rxjs", "reflect-metadata"]);
             dev_deps.push("@nestjs/cli");
         }
-        "Hono" | "Elysia" => {
-            deps.push(framework.to_lowercase().leak());
-        }
-        _ => {}
+        "Hono"   => { deps.push("hono"); }
+        "Elysia" => { deps.push("elysia"); }
+        _        => {}
     }
 
     dev_deps.extend_from_slice(&["typescript", "@types/node", "tsx"]);
@@ -87,24 +86,15 @@ fn scaffold_node_bun(
         }
         "Recommended + Prettier" => {
             dev_deps.extend_from_slice(&[
-                "eslint",
-                "@eslint/js",
-                "typescript-eslint",
-                "globals",
-                "prettier",
-                "eslint-plugin-prettier",
-                "eslint-config-prettier",
+                "eslint", "@eslint/js", "typescript-eslint", "globals",
+                "prettier", "eslint-plugin-prettier", "eslint-config-prettier",
             ]);
         }
         "Custom Strict" => {
             dev_deps.extend_from_slice(&[
-                "eslint",
-                "@eslint/js",
-                "@eslint/eslintrc",
-                "typescript-eslint",
-                "globals",
-                "eslint-plugin-prettier",
-                "eslint-config-prettier",
+                "eslint", "@eslint/js", "@eslint/eslintrc",
+                "typescript-eslint", "globals",
+                "eslint-plugin-prettier", "eslint-config-prettier",
             ]);
         }
         _ => {}
@@ -146,22 +136,22 @@ fn scaffold_node_bun(
 "#
     );
 
+    send(tx, "Writing package.json...");
     writer::write_file(base, "package.json", &package_json)?;
 
+    send(tx, format!("Running {pm} install..."));
     let (prog, args): (&str, &[&str]) = match pm {
         "pnpm" => ("pnpm", &["install"]),
         "yarn" => ("yarn", &[]),
         "bun"  => ("bun", &["install"]),
         _      => ("npm", &["install"]),
     };
-    run_in(base, prog, args)?;
+    run_in(base, prog, args, tx)?;
 
+    send(tx, "Writing config files...");
     writer::write_eslint_files(base, eslint)
 }
 
-fn sel<'a>(app: &'a App, title: &str) -> Option<&'a str> {
-    app.option_selections
-        .iter()
-        .find(|s| s.title == title)
-        .map(|s| s.choice_name)
+fn send(tx: &Sender<String>, msg: impl Into<String>) {
+    let _ = tx.send(msg.into());
 }
