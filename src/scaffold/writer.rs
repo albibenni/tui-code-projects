@@ -1,7 +1,45 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::app::App;
+const TSCONFIG_DEFAULT: &str = r#"{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
+"#;
+
+const TSCONFIG_CUSTOM_STRICT: &str = r#"{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "allowJs": true,
+    "types": ["node"],
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  }
+}
+"#;
 
 const ESLINT_RECOMMENDED: &str = r#"// @ts-check
 import eslint from "@eslint/js";
@@ -114,31 +152,7 @@ export default defineConfig(
 );
 "#;
 
-const TSCONFIG_CUSTOM_STRICT: &str = r#"{
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "moduleDetection": "force",
-    "verbatimModuleSyntax": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
-    "erasableSyntaxOnly": true,
-    "allowJs": true,
-    "types": ["node"],
-    "noImplicitOverride": true,
-    "noUncheckedIndexedAccess": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "sourceMap": true
-  }
-}
-"#;
-
-const PRETTIERRC_CUSTOM_STRICT: &str = r#"{
+const PRETTIERRC: &str = r#"{
   "trailingComma": "all",
   "tabWidth": 2,
   "semi": true,
@@ -146,37 +160,29 @@ const PRETTIERRC_CUSTOM_STRICT: &str = r#"{
 }
 "#;
 
-pub fn run(app: &App) -> Result<String, String> {
-    let base: PathBuf = [&app.config.project_path, &app.config.project_name]
-        .iter()
-        .collect();
-
-    fs::create_dir_all(&base).map_err(|e| format!("Failed to create directory: {e}"))?;
-
-    let eslint_choice = app
-        .option_selections
-        .iter()
-        .find(|s| s.title == "ESLint")
-        .map(|s| s.choice_name);
-
+pub fn write_eslint_files(base: &PathBuf, eslint_choice: &str) -> Result<(), String> {
     match eslint_choice {
-        Some("Recommended") => {
-            write_file(&base, "eslint.config.js", ESLINT_RECOMMENDED)?;
+        "Recommended" => {
+            write_file(base, "tsconfig.json", TSCONFIG_DEFAULT)?;
+            write_file(base, "eslint.config.js", ESLINT_RECOMMENDED)?;
         }
-        Some("Recommended + Prettier") => {
-            write_file(&base, "eslint.config.js", ESLINT_RECOMMENDED_PRETTIER)?;
+        "Recommended + Prettier" => {
+            write_file(base, "tsconfig.json", TSCONFIG_DEFAULT)?;
+            write_file(base, "eslint.config.js", ESLINT_RECOMMENDED_PRETTIER)?;
+            write_file(base, ".prettierrc", PRETTIERRC)?;
         }
-        Some("Custom Strict") => {
-            write_file(&base, "eslint.config.js", ESLINT_CUSTOM_STRICT)?;
-            write_file(&base, "tsconfig.json", TSCONFIG_CUSTOM_STRICT)?;
-            write_file(&base, ".prettierrc", PRETTIERRC_CUSTOM_STRICT)?;
+        "Custom Strict" => {
+            write_file(base, "tsconfig.json", TSCONFIG_CUSTOM_STRICT)?;
+            write_file(base, "eslint.config.js", ESLINT_CUSTOM_STRICT)?;
+            write_file(base, ".prettierrc", PRETTIERRC)?;
         }
-        _ => {}
+        _ => {
+            write_file(base, "tsconfig.json", TSCONFIG_DEFAULT)?;
+        }
     }
-
-    Ok(base.display().to_string())
+    Ok(())
 }
 
-fn write_file(base: &PathBuf, name: &str, content: &str) -> Result<(), String> {
+pub fn write_file(base: &PathBuf, name: &str, content: &str) -> Result<(), String> {
     fs::write(base.join(name), content).map_err(|e| format!("Failed to write {name}: {e}"))
 }
