@@ -8,4 +8,4 @@ mod typescript_frontend;
 pub mod types;
 
 pub use get_languages::get_languages;
-pub use types::{Category, Choice, Language, OptionStep};
+pub use types::{Category, Language, OptionStep};

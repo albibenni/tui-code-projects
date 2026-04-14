@@ -1,5 +1,4 @@
 use crate::app::{App, Step};
-use crate::presets::Category;
 
 #[test]
 fn app_starts_at_category_step() {

@@ -21,13 +21,6 @@ impl ConfigState {
         }
     }
 
-    pub fn active_value(&self) -> &str {
-        match self.active_field {
-            ConfigField::Name => &self.project_name,
-            ConfigField::Path => &self.project_path,
-        }
-    }
-
     pub fn active_value_mut(&mut self) -> &mut String {
         match self.active_field {
             ConfigField::Name => &mut self.project_name,
