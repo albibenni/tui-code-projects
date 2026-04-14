@@ -23,7 +23,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .border_style(theme::BORDER)
         .title_top(Span::styled(" new-project — done ", theme::TITLE))
         .title_bottom(
-            Line::from(Span::styled(" enter/q quit ", theme::HINT)).right_aligned(),
+            Line::from(Span::styled(" q quit ", theme::HINT)).right_aligned(),
         );
 
     frame.render_widget(Paragraph::new(lines).centered().block(block), area);
