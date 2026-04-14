@@ -13,8 +13,8 @@ pub fn run_in(dir: &PathBuf, program: &str, args: &[&str], tx: &Sender<String>) 
         .spawn()
         .map_err(|e| format!("Failed to start `{program}`: {e}"))?;
 
-    let stdout = child.stdout.take().expect("stdout piped");
-    let stderr = child.stderr.take().expect("stderr piped");
+    let stdout = child.stdout.take().ok_or("Failed to capture stdout")?;
+    let stderr = child.stderr.take().ok_or("Failed to capture stderr")?;
 
     let tx_out = tx.clone();
     let tx_err = tx.clone();

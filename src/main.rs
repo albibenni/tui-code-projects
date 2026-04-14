@@ -43,12 +43,10 @@ fn run(terminal: &mut ratatui::DefaultTerminal) -> io::Result<()> {
 }
 
 fn drain_scaffold(app: &mut App) {
-    if app.scaffold_rx.is_none() {
-        return;
-    }
+    let Some(rx) = &app.scaffold_rx else { return };
 
     loop {
-        match app.scaffold_rx.as_ref().unwrap().try_recv() {
+        match rx.try_recv() {
             Ok(line) => {
                 app.output_lines.push(line);
             }
