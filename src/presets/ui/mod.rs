@@ -5,6 +5,7 @@ mod done;
 mod draw;
 mod language;
 mod options;
+mod quit_confirm;
 mod running;
 mod shared;
 

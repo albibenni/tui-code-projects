@@ -1,4 +1,4 @@
-use super::{category, config, confirm, done, language, options, running};
+use super::{category, config, confirm, done, language, options, quit_confirm, running};
 use crate::app::{App, Step};
 use ratatui::Frame;
 
@@ -11,5 +11,9 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         Step::Confirm  => confirm::draw(frame, app),
         Step::Running  => running::draw(frame, app),
         Step::Done     => done::draw(frame, app),
+    }
+
+    if app.show_quit_confirm {
+        quit_confirm::draw(frame);
     }
 }
