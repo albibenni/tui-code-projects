@@ -32,7 +32,7 @@ impl App {
                 thread::spawn(move || run_threaded(params, tx));
             }
             NavAction::Back => self.step = Step::Config,
-            NavAction::Quit => self.should_quit = true,
+            NavAction::Quit => self.show_quit_confirm = true,
             _               => {}
         }
     }

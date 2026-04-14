@@ -7,7 +7,7 @@ impl App {
     pub fn handle_running(&mut self, key: KeyEvent) {
         match NavAction::from_key(key) {
             NavAction::Confirm if self.scaffold_done => self.step = Step::Done,
-            NavAction::Quit                          => self.should_quit = true,
+            NavAction::Quit                          => self.show_quit_confirm = true,
             _                                        => {}
         }
     }

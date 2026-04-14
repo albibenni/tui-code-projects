@@ -62,7 +62,7 @@ impl App {
                 }
             }
             NavAction::Quit => {
-                self.should_quit = true;
+                self.show_quit_confirm = true;
             }
             NavAction::Other => {}
         }
