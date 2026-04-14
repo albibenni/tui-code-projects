@@ -47,7 +47,43 @@ fn scaffold_deno(
     );
 
     send(tx, "Writing deno.json...");
-    writer::write_file(base, "deno.json", &deno_json)
+    writer::write_file(base, "deno.json", &deno_json)?;
+
+    send(tx, "Creating src/main.ts...");
+    write_deno_entry(base, framework)
+}
+
+fn write_deno_entry(base: &PathBuf, framework: &str) -> Result<(), String> {
+    use std::fs;
+    let src = base.join("src");
+    fs::create_dir_all(&src).map_err(|e| format!("Failed to create src/: {e}"))?;
+
+    let content = match framework {
+        "Oak" => r#"import { Application, Router } from "oak";
+
+const router = new Router();
+router.get("/", (ctx) => {
+  ctx.response.body = "Hello World!";
+});
+
+const app = new Application();
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+await app.listen({ port: 3000 });
+"#,
+        "Hono" => r#"import { Hono } from "hono";
+
+const app = new Hono();
+app.get("/", (c) => c.text("Hello World!"));
+
+Deno.serve({ port: 3000 }, app.fetch);
+"#,
+        _ => r#"console.log("Hello World!");
+"#,
+    };
+
+    writer::write_file(&src, "main.ts", content)
 }
 
 fn scaffold_node_bun(
@@ -149,7 +185,69 @@ fn scaffold_node_bun(
     run_in(base, prog, args, tx)?;
 
     send(tx, "Writing config files...");
-    writer::write_eslint_files(base, eslint)
+    writer::write_eslint_files(base, eslint)?;
+
+    send(tx, "Creating src/index.ts...");
+    write_entry_file(base, framework)
+}
+
+fn write_entry_file(base: &PathBuf, framework: &str) -> Result<(), String> {
+    use std::fs;
+    let src = base.join("src");
+    fs::create_dir_all(&src).map_err(|e| format!("Failed to create src/: {e}"))?;
+
+    let content = match framework {
+        "Express" => r#"import express from "express";
+
+const app = express();
+const port = 3000;
+
+app.get("/", (_req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
+"#,
+        "Fastify" => r#"import Fastify from "fastify";
+
+const app = Fastify({ logger: true });
+
+app.get("/", async () => {
+  return { message: "Hello World!" };
+});
+
+await app.listen({ port: 3000 });
+"#,
+        "Hono" => r#"import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+
+const app = new Hono();
+
+app.get("/", (c) => c.text("Hello World!"));
+
+serve({ fetch: app.fetch, port: 3000 });
+"#,
+        "Elysia" => r#"import { Elysia } from "elysia";
+
+const app = new Elysia()
+  .get("/", () => "Hello World!")
+  .listen(3000);
+
+console.log(`Server running at http://localhost:${app.server?.port}`);
+"#,
+        "NestJS" => r#"import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module.js";
+
+const app = await NestFactory.create(AppModule);
+await app.listen(3000);
+"#,
+        _ => r#"console.log("Hello World!");
+"#,
+    };
+
+    writer::write_file(&src, "index.ts", content)
 }
 
 fn send(tx: &Sender<String>, msg: impl Into<String>) {
