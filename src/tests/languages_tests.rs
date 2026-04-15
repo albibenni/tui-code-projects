@@ -45,3 +45,17 @@ fn frontend_languages_are_correct() {
 
     assert!(langs.contains(&"TypeScript (Frontend)"));
 }
+
+#[test]
+fn desktop_languages_are_correct() {
+    let langs: Vec<_> = get_languages()
+        .into_iter()
+        .filter(|l| l.category == Category::Desktop)
+        .map(|l| l.name)
+        .collect();
+
+    assert!(langs.contains(&"Swift"));
+    assert!(langs.contains(&"Rust (Desktop)"));
+    assert!(langs.contains(&"Go (Desktop)"));
+    assert!(langs.contains(&"Python (Desktop)"));
+}
