@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::mpsc::Sender;
 
 use super::command::run_in;
@@ -53,7 +53,7 @@ fn scaffold_deno(
     write_deno_entry(base, framework)
 }
 
-fn write_deno_entry(base: &PathBuf, framework: &str) -> Result<(), String> {
+fn write_deno_entry(base: &Path, framework: &str) -> Result<(), String> {
     use std::fs;
     let src = base.join("src");
     fs::create_dir_all(&src).map_err(|e| format!("Failed to create src/: {e}"))?;
@@ -191,7 +191,7 @@ fn scaffold_node_bun(
     write_entry_file(base, framework)
 }
 
-fn write_entry_file(base: &PathBuf, framework: &str) -> Result<(), String> {
+fn write_entry_file(base: &Path, framework: &str) -> Result<(), String> {
     use std::fs;
     let src = base.join("src");
     fs::create_dir_all(&src).map_err(|e| format!("Failed to create src/: {e}"))?;

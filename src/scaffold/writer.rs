@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 
 const TSCONFIG_DEFAULT: &str = r#"{
   "compilerOptions": {
@@ -160,7 +160,7 @@ const PRETTIERRC: &str = r#"{
 }
 "#;
 
-pub fn write_eslint_files(base: &PathBuf, eslint_choice: &str) -> Result<(), String> {
+pub fn write_eslint_files(base: &Path, eslint_choice: &str) -> Result<(), String> {
     match eslint_choice {
         "Recommended" => {
             write_file(base, "tsconfig.json", TSCONFIG_DEFAULT)?;
@@ -183,6 +183,6 @@ pub fn write_eslint_files(base: &PathBuf, eslint_choice: &str) -> Result<(), Str
     Ok(())
 }
 
-pub fn write_file(base: &PathBuf, name: &str, content: &str) -> Result<(), String> {
+pub fn write_file(base: &Path, name: &str, content: &str) -> Result<(), String> {
     fs::write(base.join(name), content).map_err(|e| format!("Failed to write {name}: {e}"))
 }
