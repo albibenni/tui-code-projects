@@ -1,12 +1,12 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 use std::sync::mpsc::Sender;
 
 use super::command::run_in;
 use super::params::ScaffoldParams;
 use super::writer::write_file;
 
-pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
     let _ = tx.send(format!("Running go mod init {}...", params.project_name));
     run_in(base, "go", &["mod", "init", &params.project_name], tx)?;
 
@@ -17,7 +17,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) ->
     write_main_go(base, project_type, framework)
 }
 
-fn write_main_go(base: &PathBuf, project_type: &str, framework: Option<&str>) -> Result<(), String> {
+fn write_main_go(base: &Path, project_type: &str, framework: Option<&str>) -> Result<(), String> {
     fs::create_dir_all(base).map_err(|e| format!("Failed to create directory: {e}"))?;
 
     let content = match (project_type, framework) {

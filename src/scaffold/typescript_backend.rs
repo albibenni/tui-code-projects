@@ -1,11 +1,11 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::mpsc::Sender;
 
 use super::command::run_in;
 use super::params::ScaffoldParams;
 use super::writer;
 
-pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
     let runtime   = params.sel("Runtime").unwrap_or("Node");
     let framework = params.sel("Framework").unwrap_or("");
     let pm        = params.sel("Package Manager").unwrap_or("npm");
@@ -20,7 +20,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) ->
 
 fn scaffold_deno(
     params: &ScaffoldParams,
-    base: &PathBuf,
+    base: &Path,
     framework: &str,
     tx: &Sender<String>,
 ) -> Result<(), String> {
@@ -88,7 +88,7 @@ Deno.serve({ port: 3000 }, app.fetch);
 
 fn scaffold_node_bun(
     params: &ScaffoldParams,
-    base: &PathBuf,
+    base: &Path,
     framework: &str,
     pm: &str,
     eslint: &str,

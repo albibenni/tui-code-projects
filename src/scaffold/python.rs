@@ -1,11 +1,11 @@
-use std::path::PathBuf;
+use std::path::Path;
 use std::sync::mpsc::Sender;
 
 use super::command::run_in;
 use super::params::ScaffoldParams;
 use super::writer::write_file;
 
-pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
     let pm           = params.sel("Package Manager").unwrap_or("pip");
     let project_type = params.sel("Project Type").unwrap_or("");
     let framework    = params.sel("Framework");

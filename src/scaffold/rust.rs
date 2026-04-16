@@ -1,10 +1,10 @@
-use std::path::PathBuf;
+use std::path::Path;
 use std::sync::mpsc::Sender;
 
 use super::command::run_in;
 use super::params::ScaffoldParams;
 
-pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
     let project_type = params.sel("Project Type").unwrap_or("Binary");
 
     if project_type == "Library" {

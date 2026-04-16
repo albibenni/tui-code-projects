@@ -1,10 +1,10 @@
-use std::path::PathBuf;
+use std::path::Path;
 use std::sync::mpsc::Sender;
 
 use super::command::run_in;
 use super::params::ScaffoldParams;
 
-pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
     let framework = params.sel("Framework").unwrap_or("");
     let variant   = params.sel("Variant");
     let pm        = params.sel("Package Manager").unwrap_or("npm");
@@ -21,7 +21,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) ->
     }
 }
 
-fn scaffold_react(base: &PathBuf, variant: Option<&str>, pm: &str, tx: &Sender<String>) -> Result<(), String> {
+fn scaffold_react(base: &Path, variant: Option<&str>, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     match variant {
         Some("Next.js") => {
             send(tx, "Running create-next-app...");
@@ -44,7 +44,7 @@ fn scaffold_react(base: &PathBuf, variant: Option<&str>, pm: &str, tx: &Sender<S
     }
 }
 
-fn scaffold_svelte(base: &PathBuf, variant: Option<&str>, pm: &str, tx: &Sender<String>) -> Result<(), String> {
+fn scaffold_svelte(base: &Path, variant: Option<&str>, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     match variant {
         Some("SvelteKit") => {
             send(tx, "Running sv create...");
@@ -59,7 +59,7 @@ fn scaffold_svelte(base: &PathBuf, variant: Option<&str>, pm: &str, tx: &Sender<
     }
 }
 
-fn scaffold_vite(base: &PathBuf, template: &str, pm: &str, tx: &Sender<String>) -> Result<(), String> {
+fn scaffold_vite(base: &Path, template: &str, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     send(tx, format!("Running create-vite ({template})..."));
     let (prog, args): (&str, Vec<&str>) = match pm {
         "pnpm" => ("pnpm", vec!["create", "vite@latest", ".", "--template", template]),
@@ -70,7 +70,7 @@ fn scaffold_vite(base: &PathBuf, template: &str, pm: &str, tx: &Sender<String>) 
     run_in(base, prog, &args, tx)
 }
 
-fn scaffold_angular(base: &PathBuf, pm: &str, tx: &Sender<String>) -> Result<(), String> {
+fn scaffold_angular(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     send(tx, "Running @angular/cli new...");
     run_in(base, "npx", &[
         "@angular/cli@latest", "new", ".",
@@ -79,7 +79,7 @@ fn scaffold_angular(base: &PathBuf, pm: &str, tx: &Sender<String>) -> Result<(),
     ], tx)
 }
 
-fn scaffold_astro(base: &PathBuf, pm: &str, tx: &Sender<String>) -> Result<(), String> {
+fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     send(tx, "Running create-astro...");
     let (prog, args): (&str, Vec<&str>) = match pm {
         "pnpm" => ("pnpm", vec!["create", "astro@latest", ".", "--template", "minimal", "--no-install", "--no-git"]),
@@ -90,7 +90,7 @@ fn scaffold_astro(base: &PathBuf, pm: &str, tx: &Sender<String>) -> Result<(), S
     run_in(base, prog, &args, tx)
 }
 
-fn scaffold_qwik(base: &PathBuf, pm: &str, tx: &Sender<String>) -> Result<(), String> {
+fn scaffold_qwik(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     send(tx, "Running create-qwik...");
     let (prog, args): (&str, Vec<&str>) = match pm {
         "pnpm" => ("pnpm", vec!["create", "qwik@latest", ".", "--no-install"]),
