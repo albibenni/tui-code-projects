@@ -132,6 +132,15 @@ fn q_types_q_does_not_quit() {
 }
 
 #[test]
+fn enter_with_path_separator_in_name_sets_error() {
+    let mut app = at_config_step();
+    app.config.project_name = "my/app".to_string();
+    app.handle_key(press(KeyCode::Enter));
+    assert!(app.config.error_message.is_some());
+    assert_eq!(app.step, Step::Config);
+}
+
+#[test]
 fn validate_project_name_rejects_path_separator() {
     assert!(validate_project_name("my/app").is_err());
 }
