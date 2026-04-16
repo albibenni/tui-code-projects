@@ -1,0 +1,54 @@
+use std::fs;
+use std::sync::mpsc;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+use crate::scaffold::{ScaffoldParams, run_threaded};
+
+fn base_params(project_path: String, project_name: &str) -> ScaffoldParams {
+    ScaffoldParams {
+        project_path,
+        project_name: project_name.to_string(),
+        language_name: "Unknown".to_string(),
+        selections: vec![],
+    }
+}
+
+fn run(params: ScaffoldParams) -> Vec<String> {
+    let (tx, rx) = mpsc::channel();
+    run_threaded(params, tx);
+    rx.iter().collect()
+}
+
+#[test]
+fn run_threaded_rejects_parent_traversal_project_name() {
+    let lines = run(base_params("./".to_string(), "../escape"));
+    assert!(lines.iter().any(|line| line.starts_with("Error:")));
+}
+
+#[test]
+fn run_threaded_rejects_absolute_project_name() {
+    let lines = run(base_params("./".to_string(), "/tmp/escape"));
+    assert!(lines.iter().any(|line| line.starts_with("Error:")));
+}
+
+#[test]
+fn run_threaded_done_path_stays_under_selected_base() {
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("system time after UNIX_EPOCH")
+        .as_nanos();
+    let root = std::env::temp_dir().join(format!("new-project-tui-{nonce}"));
+    fs::create_dir_all(&root).expect("create test root");
+
+    let project_name = "safe-app";
+    let params = base_params(root.display().to_string(), project_name);
+    let lines = run(params);
+    let expected = root.join(project_name).display().to_string();
+
+    assert!(lines
+        .iter()
+        .any(|line| line == &format!("Done — project created at {expected}")));
+
+    let _ = fs::remove_dir_all(root.join(project_name));
+    let _ = fs::remove_dir_all(root);
+}
