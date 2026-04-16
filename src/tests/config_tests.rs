@@ -1,7 +1,7 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
 
 use crate::app::{App, Step};
-use crate::config::ConfigField;
+use crate::config::{ConfigField, validate_project_name};
 
 fn press(code: KeyCode) -> KeyEvent {
     KeyEvent {
@@ -129,4 +129,19 @@ fn q_types_q_does_not_quit() {
     app.handle_key(press(KeyCode::Char('q')));
     assert!(!app.should_quit);
     assert_eq!(app.config.project_name, "q");
+}
+
+#[test]
+fn validate_project_name_rejects_path_separator() {
+    assert!(validate_project_name("my/app").is_err());
+}
+
+#[test]
+fn validate_project_name_rejects_parent_dir() {
+    assert!(validate_project_name("..").is_err());
+}
+
+#[test]
+fn validate_project_name_rejects_absolute_path() {
+    assert!(validate_project_name("/tmp/app").is_err());
 }
