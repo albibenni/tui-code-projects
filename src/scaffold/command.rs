@@ -1,10 +1,10 @@
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::mpsc::Sender;
 use std::thread;
 
-pub fn run_in(dir: &PathBuf, program: &str, args: &[&str], tx: &Sender<String>) -> Result<(), String> {
+pub fn run_in(dir: &Path, program: &str, args: &[&str], tx: &Sender<String>) -> Result<(), String> {
     let mut child = Command::new(program)
         .args(args)
         .current_dir(dir)
@@ -20,12 +20,12 @@ pub fn run_in(dir: &PathBuf, program: &str, args: &[&str], tx: &Sender<String>) 
     let tx_err = tx.clone();
 
     let t_out = thread::spawn(move || {
-        for line in BufReader::new(stdout).lines().flatten() {
+        for line in BufReader::new(stdout).lines().map_while(Result::ok) {
             let _ = tx_out.send(line);
         }
     });
     let t_err = thread::spawn(move || {
-        for line in BufReader::new(stderr).lines().flatten() {
+        for line in BufReader::new(stderr).lines().map_while(Result::ok) {
             let _ = tx_err.send(line);
         }
     });
