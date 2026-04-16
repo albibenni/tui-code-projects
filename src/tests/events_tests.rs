@@ -246,3 +246,27 @@ fn options_q_shows_quit_confirm() {
     app.handle_key(press(KeyCode::Char('q')));
     assert!(app.show_quit_confirm);
 }
+
+#[test]
+fn language_navigation_with_empty_list_does_not_panic() {
+    let mut app = at_language_step(Category::Backend);
+    app.languages.clear();
+    app.lang_state.select(Some(0));
+
+    app.handle_key(press(KeyCode::Down));
+    app.handle_key(press(KeyCode::Up));
+
+    assert_eq!(app.lang_state.selected(), None);
+}
+
+#[test]
+fn options_navigation_with_empty_choices_does_not_panic() {
+    let mut app = at_options_step(Category::Backend, 0);
+    app.option_steps[0].choices.clear();
+    app.option_list_state.select(Some(0));
+
+    app.handle_key(press(KeyCode::Down));
+    app.handle_key(press(KeyCode::Up));
+
+    assert_eq!(app.option_list_state.selected(), None);
+}
