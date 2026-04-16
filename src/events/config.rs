@@ -1,6 +1,7 @@
 use crossterm::event::{KeyCode, KeyEvent};
 
 use crate::app::{App, Step};
+use crate::config::validate_project_name;
 
 impl App {
     pub fn handle_config(&mut self, key: KeyEvent) {
@@ -16,11 +17,14 @@ impl App {
                 self.config.toggle_field();
             }
             KeyCode::Enter => {
-                if self.config.project_name.trim().is_empty() {
-                    self.config.error_message = Some("Project name cannot be empty".into());
-                } else {
-                    self.config.error_message = None;
-                    self.step = Step::Confirm;
+                match validate_project_name(&self.config.project_name) {
+                    Ok(()) => {
+                        self.config.error_message = None;
+                        self.step = Step::Confirm;
+                    }
+                    Err(message) => {
+                        self.config.error_message = Some(message.into());
+                    }
                 }
             }
             KeyCode::Esc => {

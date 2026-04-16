@@ -1,3 +1,5 @@
+use std::path::{Component, Path};
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConfigField {
     Name,
@@ -33,5 +35,20 @@ impl ConfigState {
             ConfigField::Name => ConfigField::Path,
             ConfigField::Path => ConfigField::Name,
         };
+    }
+}
+
+pub fn validate_project_name(name: &str) -> Result<(), &'static str> {
+    if name.trim().is_empty() {
+        return Err("Project name cannot be empty");
+    }
+    if name.contains('/') || name.contains('\\') {
+        return Err("Project name cannot contain path separators");
+    }
+
+    let mut components = Path::new(name).components();
+    match (components.next(), components.next()) {
+        (Some(Component::Normal(_)), None) => Ok(()),
+        _ => Err("Project name must be a single folder name"),
     }
 }

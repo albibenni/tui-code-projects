@@ -2,6 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
 
+use crate::config::validate_project_name;
+
 use super::params::ScaffoldParams;
 use super::{go, python, rust, typescript_backend, typescript_frontend};
 
@@ -13,6 +15,8 @@ pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
 }
 
 fn execute(params: &ScaffoldParams, tx: &Sender<String>) -> Result<(), String> {
+    validate_project_name(&params.project_name).map_err(ToString::to_string)?;
+
     let base: PathBuf = [&params.project_path, &params.project_name]
         .iter()
         .collect();
