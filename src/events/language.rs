@@ -1,20 +1,14 @@
 use crossterm::event::KeyEvent;
 
 use crate::app::{App, Step};
-use crate::events::NavAction;
+use crate::events::{Direction, NavAction, move_list_selection};
 
 impl App {
     pub fn handle_language(&mut self, key: KeyEvent) {
         let count = self.filtered_languages().len();
         match NavAction::from_key(key) {
-            NavAction::Down => {
-                let next = self.lang_state.selected().unwrap_or(0);
-                self.lang_state.select(Some((next + 1).min(count - 1)));
-            }
-            NavAction::Up => {
-                let prev = self.lang_state.selected().unwrap_or(0);
-                self.lang_state.select(Some(prev.saturating_sub(1)));
-            }
+            NavAction::Down => move_list_selection(&mut self.lang_state, count, Direction::Down),
+            NavAction::Up => move_list_selection(&mut self.lang_state, count, Direction::Up),
             NavAction::Confirm => {
                 if let Some(lang) = self.selected_language() {
                     self.option_steps = lang.steps.clone();

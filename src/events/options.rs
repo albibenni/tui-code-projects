@@ -1,7 +1,7 @@
 use crossterm::event::KeyEvent;
 
 use crate::app::{App, OptionSelection, Step};
-use crate::events::NavAction;
+use crate::events::{Direction, NavAction, move_list_selection};
 
 impl App {
     pub fn handle_options(&mut self, key: KeyEvent) {
@@ -11,14 +11,8 @@ impl App {
             .unwrap_or(0);
 
         match NavAction::from_key(key) {
-            NavAction::Down => {
-                let next = self.option_list_state.selected().unwrap_or(0);
-                self.option_list_state.select(Some((next + 1).min(count - 1)));
-            }
-            NavAction::Up => {
-                let prev = self.option_list_state.selected().unwrap_or(0);
-                self.option_list_state.select(Some(prev.saturating_sub(1)));
-            }
+            NavAction::Down => move_list_selection(&mut self.option_list_state, count, Direction::Down),
+            NavAction::Up => move_list_selection(&mut self.option_list_state, count, Direction::Up),
             NavAction::Confirm => {
                 let choice_idx = self.option_list_state.selected().unwrap_or(0);
                 // Extract data before mutating self
@@ -52,13 +46,11 @@ impl App {
                     self.option_steps.clear();
                     self.option_selections.clear();
                     self.step = Step::Language;
-                } else {
-                    if let Some(sel) = self.option_selections.pop() {
-                        let new_len = self.option_steps.len() - sel.follow_up_count;
-                        self.option_steps.truncate(new_len);
-                        self.option_step_index -= 1;
-                        self.option_list_state.select(Some(sel.choice_index));
-                    }
+                } else if let Some(sel) = self.option_selections.pop() {
+                    let new_len = self.option_steps.len() - sel.follow_up_count;
+                    self.option_steps.truncate(new_len);
+                    self.option_step_index -= 1;
+                    self.option_list_state.select(Some(sel.choice_index));
                 }
             }
             NavAction::Quit => {
