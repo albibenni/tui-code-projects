@@ -57,6 +57,7 @@ fn mobile_languages_are_correct() {
         .collect();
 
     assert!(langs.contains(&"Flutter"));
+    assert!(langs.contains(&"Kotlin (Mobile)"));
 }
 
 #[test]

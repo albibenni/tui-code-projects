@@ -5,7 +5,10 @@ use std::sync::mpsc::Sender;
 use crate::config::validate_project_name;
 
 use super::params::ScaffoldParams;
-use super::{flutter, go, java, php, python, rust, typescript_backend, typescript_frontend};
+use super::{
+    flutter, go, go_desktop, java, kotlin_mobile, php, python, python_desktop, rust, rust_desktop,
+    swift_desktop, typescript_backend, typescript_frontend,
+};
 
 pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
     if let Err(e) = execute(&params, &tx) {
@@ -27,10 +30,15 @@ fn execute(params: &ScaffoldParams, tx: &Sender<String>) -> Result<(), String> {
         "TypeScript (Backend)" => typescript_backend::scaffold(params, &base, tx)?,
         "TypeScript (Frontend)" => typescript_frontend::scaffold(params, &base, tx)?,
         "Flutter" => flutter::scaffold(params, &base, tx)?,
+        "Kotlin (Mobile)" => kotlin_mobile::scaffold(params, &base, tx)?,
         "Go" => go::scaffold(params, &base, tx)?,
+        "Go (Desktop)" => go_desktop::scaffold(params, &base, tx)?,
         "Java" => java::scaffold(params, &base, tx)?,
         "PHP" => php::scaffold(params, &base, tx)?,
+        "Python (Desktop)" => python_desktop::scaffold(params, &base, tx)?,
         "Rust" => rust::scaffold(params, &base, tx)?,
+        "Rust (Desktop)" => rust_desktop::scaffold(params, &base, tx)?,
+        "Swift" => swift_desktop::scaffold(params, &base, tx)?,
         "Python" => python::scaffold(params, &base, tx)?,
         _ => {}
     }

@@ -3,6 +3,7 @@ mod get_languages;
 mod go;
 mod go_desktop;
 mod java;
+mod kotlin_mobile;
 mod php;
 mod python;
 mod python_desktop;
