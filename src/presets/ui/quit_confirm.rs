@@ -13,13 +13,15 @@ pub fn draw(frame: &mut Frame) {
         .border_type(BorderType::Rounded)
         .border_style(theme::SELECTED)
         .title_top(Span::styled(" quit? ", theme::TITLE))
-        .title_bottom(
-            Line::from(Span::styled(" y yes  n no ", theme::HINT)).right_aligned(),
-        );
+        .title_bottom(Line::from(Span::styled(" y yes  n no ", theme::HINT)).right_aligned());
 
-    let text = Line::from(vec![
-        Span::styled("  Are you sure you want to quit?", theme::UNSELECTED),
-    ]);
+    let text = Line::from(vec![Span::styled(
+        "  Are you sure you want to quit?",
+        theme::UNSELECTED,
+    )]);
 
-    frame.render_widget(Paragraph::new(vec![Line::from(""), text]).block(block), area);
+    frame.render_widget(
+        Paragraph::new(vec![Line::from(""), text]).block(block),
+        area,
+    );
 }

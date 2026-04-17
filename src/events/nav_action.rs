@@ -12,12 +12,12 @@ pub enum NavAction {
 impl NavAction {
     pub fn from_key(key: KeyEvent) -> Self {
         match key.code {
-            KeyCode::Up | KeyCode::Char('k')   => NavAction::Up,
+            KeyCode::Up | KeyCode::Char('k') => NavAction::Up,
             KeyCode::Down | KeyCode::Char('j') => NavAction::Down,
-            KeyCode::Enter                     => NavAction::Confirm,
-            KeyCode::Esc | KeyCode::Char('b')  => NavAction::Back,
-            KeyCode::Char('q')                 => NavAction::Quit,
-            _                                  => NavAction::Other,
+            KeyCode::Enter => NavAction::Confirm,
+            KeyCode::Esc | KeyCode::Char('b') => NavAction::Back,
+            KeyCode::Char('q') => NavAction::Quit,
+            _ => NavAction::Other,
         }
     }
 }

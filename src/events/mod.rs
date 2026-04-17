@@ -1,6 +1,6 @@
 mod category;
-mod confirm;
 mod config;
+mod confirm;
 mod dispatcher;
 mod done;
 mod language;

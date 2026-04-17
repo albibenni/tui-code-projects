@@ -23,7 +23,10 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         .border_type(BorderType::Rounded)
         .border_style(theme::BORDER)
         .title_top(Span::styled(
-            format!(" new-project — {} — {} — {} ", category_label, lang_name, step_title),
+            format!(
+                " new-project — {} — {} — {} ",
+                category_label, lang_name, step_title
+            ),
             theme::TITLE,
         ))
         .title_bottom(

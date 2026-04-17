@@ -11,7 +11,9 @@ impl App {
             .unwrap_or(0);
 
         match NavAction::from_key(key) {
-            NavAction::Down => move_list_selection(&mut self.option_list_state, count, Direction::Down),
+            NavAction::Down => {
+                move_list_selection(&mut self.option_list_state, count, Direction::Down)
+            }
             NavAction::Up => move_list_selection(&mut self.option_list_state, count, Direction::Up),
             NavAction::Confirm => {
                 let choice_idx = self.option_list_state.selected().unwrap_or(0);

@@ -1,5 +1,5 @@
-use ratatui::style::{Color, Modifier};
 use crate::style::theme;
+use ratatui::style::{Color, Modifier};
 
 #[test]
 fn selected_is_magenta_and_bold() {

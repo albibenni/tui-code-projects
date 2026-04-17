@@ -50,11 +50,8 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .border_style(theme::BORDER)
         .title_top(Span::styled(" new-project — confirm ", theme::TITLE))
         .title_bottom(
-            Line::from(Span::styled(
-                " enter confirm  b back  q quit ",
-                theme::HINT,
-            ))
-            .right_aligned(),
+            Line::from(Span::styled(" enter confirm  b back  q quit ", theme::HINT))
+                .right_aligned(),
         );
 
     frame.render_widget(Paragraph::new(lines).block(block), area);

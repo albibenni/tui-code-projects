@@ -14,10 +14,26 @@ pub fn typescript_frontend_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Variant",
                         choices: vec![
-                            Choice { name: "Vite",    description: "Fast SPA setup with Vite",        follow_up: vec![pm_js()] },
-                            Choice { name: "Next.js", description: "React SSR/SSG framework",         follow_up: vec![pm_js()] },
-                            Choice { name: "Remix",   description: "Full-stack React framework",      follow_up: vec![pm_js()] },
-                            Choice { name: "Expo",    description: "React Native cross-platform",     follow_up: vec![pm_js()] },
+                            Choice {
+                                name: "Vite",
+                                description: "Fast SPA setup with Vite",
+                                follow_up: vec![pm_js()],
+                            },
+                            Choice {
+                                name: "Next.js",
+                                description: "React SSR/SSG framework",
+                                follow_up: vec![pm_js()],
+                            },
+                            Choice {
+                                name: "Remix",
+                                description: "Full-stack React framework",
+                                follow_up: vec![pm_js()],
+                            },
+                            Choice {
+                                name: "Expo",
+                                description: "React Native cross-platform",
+                                follow_up: vec![pm_js()],
+                            },
                         ],
                     }],
                 },
@@ -32,8 +48,16 @@ pub fn typescript_frontend_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Variant",
                         choices: vec![
-                            Choice { name: "SvelteKit", description: "Full-stack Svelte framework", follow_up: vec![pm_js()] },
-                            Choice { name: "Vite",      description: "Lightweight SPA setup",       follow_up: vec![pm_js()] },
+                            Choice {
+                                name: "SvelteKit",
+                                description: "Full-stack Svelte framework",
+                                follow_up: vec![pm_js()],
+                            },
+                            Choice {
+                                name: "Vite",
+                                description: "Lightweight SPA setup",
+                                follow_up: vec![pm_js()],
+                            },
                         ],
                     }],
                 },
@@ -43,8 +67,16 @@ pub fn typescript_frontend_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Package Manager",
                         choices: vec![
-                            Choice { name: "npm",  description: "Default Node.js package manager",      follow_up: vec![] },
-                            Choice { name: "pnpm", description: "Fast, disk-efficient package manager", follow_up: vec![] },
+                            Choice {
+                                name: "npm",
+                                description: "Default Node.js package manager",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "pnpm",
+                                description: "Fast, disk-efficient package manager",
+                                follow_up: vec![],
+                            },
                         ],
                     }],
                 },

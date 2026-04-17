@@ -24,9 +24,21 @@ pub fn python_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Framework",
                         choices: vec![
-                            Choice { name: "FastAPI", description: "Modern async REST API framework",   follow_up: vec![pm_python()] },
-                            Choice { name: "Flask",   description: "Lightweight WSGI web framework",   follow_up: vec![pm_python()] },
-                            Choice { name: "Django",  description: "Batteries-included web framework", follow_up: vec![pm_python()] },
+                            Choice {
+                                name: "FastAPI",
+                                description: "Modern async REST API framework",
+                                follow_up: vec![pm_python()],
+                            },
+                            Choice {
+                                name: "Flask",
+                                description: "Lightweight WSGI web framework",
+                                follow_up: vec![pm_python()],
+                            },
+                            Choice {
+                                name: "Django",
+                                description: "Batteries-included web framework",
+                                follow_up: vec![pm_python()],
+                            },
                         ],
                     }],
                 },
@@ -36,10 +48,26 @@ pub fn python_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Package Manager",
                         choices: vec![
-                            Choice { name: "pip",    description: "Standard Python package manager",     follow_up: vec![] },
-                            Choice { name: "conda",  description: "Cross-platform package manager",     follow_up: vec![] },
-                            Choice { name: "poetry", description: "Dependency management and packaging", follow_up: vec![] },
-                            Choice { name: "uv",     description: "Fast Python package installer",      follow_up: vec![] },
+                            Choice {
+                                name: "pip",
+                                description: "Standard Python package manager",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "conda",
+                                description: "Cross-platform package manager",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "poetry",
+                                description: "Dependency management and packaging",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "uv",
+                                description: "Fast Python package installer",
+                                follow_up: vec![],
+                            },
                         ],
                     }],
                 },

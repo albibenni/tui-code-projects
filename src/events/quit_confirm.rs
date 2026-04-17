@@ -10,8 +10,8 @@ impl App {
         }
         match key.code {
             KeyCode::Char('y') | KeyCode::Enter => self.should_quit = true,
-            KeyCode::Char('n') | KeyCode::Esc   => self.show_quit_confirm = false,
-            _                                   => {}
+            KeyCode::Char('n') | KeyCode::Esc => self.show_quit_confirm = false,
+            _ => {}
         }
         true
     }

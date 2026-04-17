@@ -23,11 +23,31 @@ pub fn go_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Framework",
                         choices: vec![
-                            Choice { name: "Gin",      description: "Fast HTTP web framework",           follow_up: vec![] },
-                            Choice { name: "Echo",     description: "High performance web framework",    follow_up: vec![] },
-                            Choice { name: "Fiber",    description: "Express-inspired web framework",    follow_up: vec![] },
-                            Choice { name: "Chi",      description: "Lightweight and composable router", follow_up: vec![] },
-                            Choice { name: "net/http", description: "Standard library HTTP",             follow_up: vec![] },
+                            Choice {
+                                name: "Gin",
+                                description: "Fast HTTP web framework",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "Echo",
+                                description: "High performance web framework",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "Fiber",
+                                description: "Express-inspired web framework",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "Chi",
+                                description: "Lightweight and composable router",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "net/http",
+                                description: "Standard library HTTP",
+                                follow_up: vec![],
+                            },
                         ],
                     }],
                 },

@@ -234,7 +234,7 @@ fn options_back_restores_previous_selection_and_removes_follow_up() {
     let mut app = at_options_step(Category::Backend, 0); // Rust
     app.option_list_state.select(Some(2)); // Web API
     app.handle_key(press(KeyCode::Enter)); // now at Framework step
-    app.handle_key(press(KeyCode::Esc));   // go back
+    app.handle_key(press(KeyCode::Esc)); // go back
     assert_eq!(app.option_step_index, 0);
     assert_eq!(app.option_list_state.selected(), Some(2)); // restored
     assert_eq!(app.option_steps.len(), 1); // follow_up removed

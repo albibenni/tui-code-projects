@@ -21,7 +21,8 @@ fn write_main_go(base: &Path, project_type: &str, framework: Option<&str>) -> Re
     fs::create_dir_all(base).map_err(|e| format!("Failed to create directory: {e}"))?;
 
     let content = match (project_type, framework) {
-        ("Web API", Some("Gin")) => r#"package main
+        ("Web API", Some("Gin")) => {
+            r#"package main
 
 import "github.com/gin-gonic/gin"
 
@@ -32,8 +33,10 @@ func main() {
 	})
 	r.Run(":3000")
 }
-"#,
-        ("Web API", Some("Echo")) => r#"package main
+"#
+        }
+        ("Web API", Some("Echo")) => {
+            r#"package main
 
 import (
 	"net/http"
@@ -48,8 +51,10 @@ func main() {
 	})
 	e.Logger.Fatal(e.Start(":3000"))
 }
-"#,
-        ("Web API", Some("Fiber")) => r#"package main
+"#
+        }
+        ("Web API", Some("Fiber")) => {
+            r#"package main
 
 import "github.com/gofiber/fiber/v2"
 
@@ -60,8 +65,10 @@ func main() {
 	})
 	app.Listen(":3000")
 }
-"#,
-        ("Web API", Some("Chi")) => r#"package main
+"#
+        }
+        ("Web API", Some("Chi")) => {
+            r#"package main
 
 import (
 	"fmt"
@@ -77,8 +84,10 @@ func main() {
 	})
 	http.ListenAndServe(":3000", r)
 }
-"#,
-        ("Web API", _) => r#"package main
+"#
+        }
+        ("Web API", _) => {
+            r#"package main
 
 import (
 	"fmt"
@@ -91,20 +100,25 @@ func main() {
 	})
 	http.ListenAndServe(":3000", nil)
 }
-"#,
-        ("Library", _) => r#"package main
+"#
+        }
+        ("Library", _) => {
+            r#"package main
 
 // Package main is the entry point for the library.
 func main() {}
-"#,
-        _ => r#"package main
+"#
+        }
+        _ => {
+            r#"package main
 
 import "fmt"
 
 func main() {
 	fmt.Println("Hello World!")
 }
-"#,
+"#
+        }
     };
 
     write_file(base, "main.go", content)

@@ -6,9 +6,9 @@ use super::params::ScaffoldParams;
 use super::writer::write_file;
 
 pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
-    let pm           = params.sel("Package Manager").unwrap_or("pip");
+    let pm = params.sel("Package Manager").unwrap_or("pip");
     let project_type = params.sel("Project Type").unwrap_or("");
-    let framework    = params.sel("Framework");
+    let framework = params.sel("Framework");
 
     match pm {
         "uv" => {
@@ -25,7 +25,11 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
         }
         _ => {
             let _ = tx.send("Writing requirements.txt...".to_string());
-            write_file(base, "requirements.txt", &requirements(project_type, framework))?;
+            write_file(
+                base,
+                "requirements.txt",
+                &requirements(project_type, framework),
+            )?;
         }
     }
 
@@ -36,10 +40,10 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
 fn requirements(project_type: &str, framework: Option<&str>) -> String {
     match (project_type, framework) {
         ("Web API", Some("FastAPI")) => "fastapi\nuvicorn[standard]\n".to_string(),
-        ("Web API", Some("Flask"))   => "flask\n".to_string(),
-        ("Web API", Some("Django"))  => "django\n".to_string(),
-        ("Data Science", _)          => "numpy\npandas\nmatplotlib\n".to_string(),
-        _                            => "# Add your dependencies here\n".to_string(),
+        ("Web API", Some("Flask")) => "flask\n".to_string(),
+        ("Web API", Some("Django")) => "django\n".to_string(),
+        ("Data Science", _) => "numpy\npandas\nmatplotlib\n".to_string(),
+        _ => "# Add your dependencies here\n".to_string(),
     }
 }
 
@@ -52,7 +56,8 @@ app = FastAPI()
 @app.get("/")
 def root():
     return {"message": "Hello World!"}
-"#.to_string(),
+"#
+        .to_string(),
         ("Web API", Some("Flask")) => r#"from flask import Flask
 
 app = Flask(__name__)
@@ -63,16 +68,19 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
-"#.to_string(),
+"#
+        .to_string(),
         ("Web API", Some("Django")) => r#"# Run: django-admin startproject myproject .
 # Then: python manage.py runserver
 print("Run: django-admin startproject myproject .")
-"#.to_string(),
+"#
+        .to_string(),
         ("Data Science", _) => r#"import numpy as np
 import pandas as pd
 
 print("Hello, Data Science!")
-"#.to_string(),
+"#
+        .to_string(),
         ("CLI", _) => r#"import argparse
 
 def main():
@@ -83,7 +91,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-"#.to_string(),
+"#
+        .to_string(),
         _ => "print(\"Hello World!\")\n".to_string(),
     }
 }

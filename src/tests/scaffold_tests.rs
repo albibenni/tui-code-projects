@@ -45,9 +45,11 @@ fn run_threaded_done_path_stays_under_selected_base() {
     let lines = run(params);
     let expected = root.join(project_name).display().to_string();
 
-    assert!(lines
-        .iter()
-        .any(|line| line == &format!("Done — project created at {expected}")));
+    assert!(
+        lines
+            .iter()
+            .any(|line| line == &format!("Done — project created at {expected}"))
+    );
 
     let _ = fs::remove_dir_all(root.join(project_name));
     let _ = fs::remove_dir_all(root);

@@ -8,7 +8,9 @@ impl App {
     pub fn handle_category(&mut self, key: KeyEvent) {
         let count = Category::all().len();
         match NavAction::from_key(key) {
-            NavAction::Down => move_list_selection(&mut self.category_state, count, Direction::Down),
+            NavAction::Down => {
+                move_list_selection(&mut self.category_state, count, Direction::Down)
+            }
             NavAction::Up => move_list_selection(&mut self.category_state, count, Direction::Up),
             NavAction::Confirm => {
                 let i = self.category_state.selected().unwrap_or(0);

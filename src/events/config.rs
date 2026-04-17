@@ -16,17 +16,15 @@ impl App {
             KeyCode::Tab => {
                 self.config.toggle_field();
             }
-            KeyCode::Enter => {
-                match validate_project_name(&self.config.project_name) {
-                    Ok(()) => {
-                        self.config.error_message = None;
-                        self.step = Step::Confirm;
-                    }
-                    Err(message) => {
-                        self.config.error_message = Some(message.into());
-                    }
+            KeyCode::Enter => match validate_project_name(&self.config.project_name) {
+                Ok(()) => {
+                    self.config.error_message = None;
+                    self.step = Step::Confirm;
                 }
-            }
+                Err(message) => {
+                    self.config.error_message = Some(message.into());
+                }
+            },
             KeyCode::Esc => {
                 self.config.error_message = None;
                 self.step = Step::Options;

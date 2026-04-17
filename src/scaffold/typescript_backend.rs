@@ -6,10 +6,10 @@ use super::params::ScaffoldParams;
 use super::writer;
 
 pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
-    let runtime   = params.sel("Runtime").unwrap_or("Node");
+    let runtime = params.sel("Runtime").unwrap_or("Node");
     let framework = params.sel("Framework").unwrap_or("");
-    let pm        = params.sel("Package Manager").unwrap_or("npm");
-    let eslint    = params.sel("ESLint").unwrap_or("None");
+    let pm = params.sel("Package Manager").unwrap_or("npm");
+    let eslint = params.sel("ESLint").unwrap_or("None");
 
     if runtime == "Deno" {
         scaffold_deno(params, base, framework, tx)
@@ -25,10 +25,10 @@ fn scaffold_deno(
     tx: &Sender<String>,
 ) -> Result<(), String> {
     let imports = match framework {
-        "Oak"   => "\n    \"oak\": \"jsr:@oak/oak\"",
+        "Oak" => "\n    \"oak\": \"jsr:@oak/oak\"",
         "Fresh" => "\n    \"$fresh/\": \"jsr:@fresh/fresh/\"",
-        "Hono"  => "\n    \"hono\": \"jsr:@hono/hono\"",
-        _       => "",
+        "Hono" => "\n    \"hono\": \"jsr:@hono/hono\"",
+        _ => "",
     };
 
     let deno_json = format!(
@@ -59,7 +59,8 @@ fn write_deno_entry(base: &Path, framework: &str) -> Result<(), String> {
     fs::create_dir_all(&src).map_err(|e| format!("Failed to create src/: {e}"))?;
 
     let content = match framework {
-        "Oak" => r#"import { Application, Router } from "oak";
+        "Oak" => {
+            r#"import { Application, Router } from "oak";
 
 const router = new Router();
 router.get("/", (ctx) => {
@@ -71,16 +72,21 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 await app.listen({ port: 3000 });
-"#,
-        "Hono" => r#"import { Hono } from "hono";
+"#
+        }
+        "Hono" => {
+            r#"import { Hono } from "hono";
 
 const app = new Hono();
 app.get("/", (c) => c.text("Hello World!"));
 
 Deno.serve({ port: 3000 }, app.fetch);
-"#,
-        _ => r#"console.log("Hello World!");
-"#,
+"#
+        }
+        _ => {
+            r#"console.log("Hello World!");
+"#
+        }
     };
 
     writer::write_file(&src, "main.ts", content)
@@ -96,7 +102,7 @@ fn scaffold_node_bun(
 ) -> Result<(), String> {
     let name = &params.project_name;
 
-    let mut deps: Vec<&str>     = Vec::new();
+    let mut deps: Vec<&str> = Vec::new();
     let mut dev_deps: Vec<&str> = Vec::new();
 
     match framework {
@@ -104,14 +110,20 @@ fn scaffold_node_bun(
             deps.push("express");
             dev_deps.push("@types/express");
         }
-        "Fastify" => { deps.push("fastify"); }
-        "NestJS"  => {
+        "Fastify" => {
+            deps.push("fastify");
+        }
+        "NestJS" => {
             deps.extend_from_slice(&["@nestjs/core", "@nestjs/common", "rxjs", "reflect-metadata"]);
             dev_deps.push("@nestjs/cli");
         }
-        "Hono"   => { deps.push("hono"); }
-        "Elysia" => { deps.push("elysia"); }
-        _        => {}
+        "Hono" => {
+            deps.push("hono");
+        }
+        "Elysia" => {
+            deps.push("elysia");
+        }
+        _ => {}
     }
 
     dev_deps.extend_from_slice(&["typescript", "@types/node", "tsx"]);
@@ -122,15 +134,24 @@ fn scaffold_node_bun(
         }
         "Recommended + Prettier" => {
             dev_deps.extend_from_slice(&[
-                "eslint", "@eslint/js", "typescript-eslint", "globals",
-                "prettier", "eslint-plugin-prettier", "eslint-config-prettier",
+                "eslint",
+                "@eslint/js",
+                "typescript-eslint",
+                "globals",
+                "prettier",
+                "eslint-plugin-prettier",
+                "eslint-config-prettier",
             ]);
         }
         "Custom Strict" => {
             dev_deps.extend_from_slice(&[
-                "eslint", "@eslint/js", "@eslint/eslintrc",
-                "typescript-eslint", "globals",
-                "eslint-plugin-prettier", "eslint-config-prettier",
+                "eslint",
+                "@eslint/js",
+                "@eslint/eslintrc",
+                "typescript-eslint",
+                "globals",
+                "eslint-plugin-prettier",
+                "eslint-config-prettier",
             ]);
         }
         _ => {}
@@ -179,8 +200,8 @@ fn scaffold_node_bun(
     let (prog, args): (&str, &[&str]) = match pm {
         "pnpm" => ("pnpm", &["install"]),
         "yarn" => ("yarn", &[]),
-        "bun"  => ("bun", &["install"]),
-        _      => ("npm", &["install"]),
+        "bun" => ("bun", &["install"]),
+        _ => ("npm", &["install"]),
     };
     run_in(base, prog, args, tx)?;
 
@@ -197,7 +218,8 @@ fn write_entry_file(base: &Path, framework: &str) -> Result<(), String> {
     fs::create_dir_all(&src).map_err(|e| format!("Failed to create src/: {e}"))?;
 
     let content = match framework {
-        "Express" => r#"import express from "express";
+        "Express" => {
+            r#"import express from "express";
 
 const app = express();
 const port = 3000;
@@ -209,8 +231,10 @@ app.get("/", (_req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
-"#,
-        "Fastify" => r#"import Fastify from "fastify";
+"#
+        }
+        "Fastify" => {
+            r#"import Fastify from "fastify";
 
 const app = Fastify({ logger: true });
 
@@ -219,8 +243,10 @@ app.get("/", async () => {
 });
 
 await app.listen({ port: 3000 });
-"#,
-        "Hono" => r#"import { Hono } from "hono";
+"#
+        }
+        "Hono" => {
+            r#"import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 
 const app = new Hono();
@@ -228,23 +254,30 @@ const app = new Hono();
 app.get("/", (c) => c.text("Hello World!"));
 
 serve({ fetch: app.fetch, port: 3000 });
-"#,
-        "Elysia" => r#"import { Elysia } from "elysia";
+"#
+        }
+        "Elysia" => {
+            r#"import { Elysia } from "elysia";
 
 const app = new Elysia()
   .get("/", () => "Hello World!")
   .listen(3000);
 
 console.log(`Server running at http://localhost:${app.server?.port}`);
-"#,
-        "NestJS" => r#"import { NestFactory } from "@nestjs/core";
+"#
+        }
+        "NestJS" => {
+            r#"import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module.js";
 
 const app = await NestFactory.create(AppModule);
 await app.listen(3000);
-"#,
-        _ => r#"console.log("Hello World!");
-"#,
+"#
+        }
+        _ => {
+            r#"console.log("Hello World!");
+"#
+        }
     };
 
     writer::write_file(&src, "index.ts", content)

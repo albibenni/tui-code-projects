@@ -33,7 +33,7 @@ impl App {
             }
             NavAction::Back => self.step = Step::Config,
             NavAction::Quit => self.show_quit_confirm = true,
-            _               => {}
+            _ => {}
         }
     }
 }

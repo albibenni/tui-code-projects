@@ -8,7 +8,11 @@ use ratatui::widgets::{Block, BorderType, Paragraph};
 pub fn draw(frame: &mut Frame, app: &App) {
     let is_error = app.result_message.starts_with("Error:");
 
-    let message_style = if is_error { theme::ERROR } else { theme::SELECTED };
+    let message_style = if is_error {
+        theme::ERROR
+    } else {
+        theme::SELECTED
+    };
 
     let lines = vec![
         Line::from(""),
@@ -22,9 +26,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .border_type(BorderType::Rounded)
         .border_style(theme::BORDER)
         .title_top(Span::styled(" new-project — done ", theme::TITLE))
-        .title_bottom(
-            Line::from(Span::styled(" q quit ", theme::HINT)).right_aligned(),
-        );
+        .title_bottom(Line::from(Span::styled(" q quit ", theme::HINT)).right_aligned());
 
     frame.render_widget(Paragraph::new(lines).centered().block(block), area);
 }

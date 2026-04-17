@@ -52,13 +52,14 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     let name_active = app.config.active_field == ConfigField::Name;
     let name_block = Block::bordered()
         .border_type(BorderType::Rounded)
-        .border_style(if name_active { theme::SELECTED } else { theme::BORDER });
+        .border_style(if name_active {
+            theme::SELECTED
+        } else {
+            theme::BORDER
+        });
     let name_inner = name_block.inner(rows[2]);
     frame.render_widget(name_block, rows[2]);
-    frame.render_widget(
-        Paragraph::new(app.config.project_name.as_str()),
-        name_inner,
-    );
+    frame.render_widget(Paragraph::new(app.config.project_name.as_str()), name_inner);
 
     // Path label
     frame.render_widget(
@@ -70,13 +71,14 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     let path_active = app.config.active_field == ConfigField::Path;
     let path_block = Block::bordered()
         .border_type(BorderType::Rounded)
-        .border_style(if path_active { theme::SELECTED } else { theme::BORDER });
+        .border_style(if path_active {
+            theme::SELECTED
+        } else {
+            theme::BORDER
+        });
     let path_inner = path_block.inner(rows[5]);
     frame.render_widget(path_block, rows[5]);
-    frame.render_widget(
-        Paragraph::new(app.config.project_path.as_str()),
-        path_inner,
-    );
+    frame.render_widget(Paragraph::new(app.config.project_path.as_str()), path_inner);
 
     // Error message
     if let Some(ref err) = app.config.error_message {

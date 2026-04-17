@@ -23,10 +23,26 @@ pub fn rust_language() -> Language {
                     follow_up: vec![OptionStep {
                         title: "Framework",
                         choices: vec![
-                            Choice { name: "Axum",      description: "Modular web framework by Tokio",       follow_up: vec![] },
-                            Choice { name: "Actix-web", description: "Powerful and fast web framework",      follow_up: vec![] },
-                            Choice { name: "Rocket",    description: "Web framework focused on ease of use", follow_up: vec![] },
-                            Choice { name: "Warp",      description: "Composable web server framework",      follow_up: vec![] },
+                            Choice {
+                                name: "Axum",
+                                description: "Modular web framework by Tokio",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "Actix-web",
+                                description: "Powerful and fast web framework",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "Rocket",
+                                description: "Web framework focused on ease of use",
+                                follow_up: vec![],
+                            },
+                            Choice {
+                                name: "Warp",
+                                description: "Composable web server framework",
+                                follow_up: vec![],
+                            },
                         ],
                     }],
                 },
