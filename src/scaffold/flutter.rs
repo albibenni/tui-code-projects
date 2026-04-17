@@ -4,6 +4,7 @@ use std::sync::mpsc::Sender;
 
 use super::command::run_in;
 use super::params::ScaffoldParams;
+use super::writer::write_file;
 
 pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
     let start_config = params
@@ -22,6 +23,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
 
     add_state_management_package(base, state_management, tx)?;
     write_vscode_launch(base, start_config, tx)?;
+    write_file(base, "Makefile", makefile())?;
 
     Ok(())
 }
@@ -105,4 +107,26 @@ fn web_config(name: &str, mode: Option<&str>) -> String {
 
 fn send(tx: &Sender<String>, msg: impl Into<String>) {
     let _ = tx.send(msg.into());
+}
+
+fn makefile() -> &'static str {
+    r#"FLUTTER ?= flutter
+
+.PHONY: setup run test analyze clean
+
+setup:
+	@$(FLUTTER) pub get
+
+run:
+	@$(FLUTTER) run
+
+test:
+	@$(FLUTTER) test
+
+analyze:
+	@$(FLUTTER) analyze
+
+clean:
+	@$(FLUTTER) clean
+"#
 }

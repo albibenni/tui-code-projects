@@ -34,7 +34,8 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     }
 
     let _ = tx.send("Creating main.py...".to_string());
-    write_file(base, "main.py", &entry_file(project_type, framework))
+    write_file(base, "main.py", &entry_file(project_type, framework))?;
+    write_file(base, "Makefile", makefile(pm))
 }
 
 fn requirements(project_type: &str, framework: Option<&str>) -> String {
@@ -102,4 +103,83 @@ fn conda_env(params: &ScaffoldParams) -> String {
         "name: {}\nchannels:\n  - defaults\ndependencies:\n  - python>=3.11\n",
         params.project_name
     )
+}
+
+fn makefile(pm: &str) -> &'static str {
+    match pm {
+        "uv" => {
+            r#"UV ?= uv
+
+.PHONY: install run test lint
+
+install:
+	@$(UV) sync
+
+run:
+	@$(UV) run python main.py
+
+test:
+	@$(UV) run pytest -q
+
+lint:
+	@$(UV) run ruff check .
+"#
+        }
+        "poetry" => {
+            r#"POETRY ?= poetry
+
+.PHONY: install run test lint
+
+install:
+	@$(POETRY) install
+
+run:
+	@$(POETRY) run python main.py
+
+test:
+	@$(POETRY) run pytest -q
+
+lint:
+	@$(POETRY) run ruff check .
+"#
+        }
+        "conda" => {
+            r#"CONDA ?= conda
+PYTHON ?= python3
+
+.PHONY: install run test lint
+
+install:
+	@$(CONDA) env create -f environment.yml || true
+
+run:
+	@$(PYTHON) main.py
+
+test:
+	@pytest -q
+
+lint:
+	@ruff check .
+"#
+        }
+        _ => {
+            r#"PYTHON ?= python3
+PIP ?= pip
+
+.PHONY: install run test lint
+
+install:
+	@$(PIP) install -r requirements.txt
+
+run:
+	@$(PYTHON) main.py
+
+test:
+	@pytest -q
+
+lint:
+	@ruff check .
+"#
+        }
+    }
 }

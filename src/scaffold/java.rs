@@ -25,13 +25,56 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
         "Gradle" => {
             write_file(base, "settings.gradle", "rootProject.name = 'app'\n")?;
             write_file(base, "build.gradle", &gradle_file(project_type, framework))?;
+            write_file(base, "Makefile", makefile(build_tool))?;
         }
         _ => {
             write_file(base, "pom.xml", &pom_xml(params, project_type, framework))?;
+            write_file(base, "Makefile", makefile(build_tool))?;
         }
     }
 
     Ok(())
+}
+
+fn makefile(build_tool: &str) -> &'static str {
+    match build_tool {
+        "Gradle" => {
+            r#"GRADLE ?= gradle
+
+.PHONY: build run test clean
+
+build:
+	@$(GRADLE) build
+
+run:
+	@$(GRADLE) run || true
+
+test:
+	@$(GRADLE) test
+
+clean:
+	@$(GRADLE) clean
+"#
+        }
+        _ => {
+            r#"MAVEN ?= mvn
+
+.PHONY: build run test clean
+
+build:
+	@$(MAVEN) -q package
+
+run:
+	@$(MAVEN) -q exec:java || true
+
+test:
+	@$(MAVEN) -q test
+
+clean:
+	@$(MAVEN) -q clean
+"#
+        }
+    }
 }
 
 fn readme(project_type: &str, framework: Option<&str>, build_tool: &str) -> String {

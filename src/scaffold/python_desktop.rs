@@ -11,6 +11,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     write_file(base, "README.md", &readme(framework))?;
     write_file(base, "main.py", entry(framework))?;
     write_file(base, "requirements.txt", requirements(framework))?;
+    write_file(base, "Makefile", makefile())?;
     Ok(())
 }
 
@@ -78,4 +79,24 @@ root.mainloop()
 "#
         }
     }
+}
+
+fn makefile() -> &'static str {
+    r#"PYTHON ?= python3
+PIP ?= pip
+
+.PHONY: install run test lint
+
+install:
+	@$(PIP) install -r requirements.txt
+
+run:
+	@$(PYTHON) main.py
+
+test:
+	@pytest -q
+
+lint:
+	@ruff check .
+"#
 }

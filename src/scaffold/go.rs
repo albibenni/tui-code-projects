@@ -14,7 +14,8 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     let project_type = params.sel("Project Type").unwrap_or("");
 
     let _ = tx.send("Creating main.go...".to_string());
-    write_main_go(base, project_type, framework)
+    write_main_go(base, project_type, framework)?;
+    write_file(base, "Makefile", makefile(project_type))
 }
 
 fn write_main_go(base: &Path, project_type: &str, framework: Option<&str>) -> Result<(), String> {
@@ -122,4 +123,45 @@ func main() {
     };
 
     write_file(base, "main.go", content)
+}
+
+fn makefile(project_type: &str) -> &'static str {
+    if project_type == "Library" {
+        r#"GO ?= go
+
+.PHONY: build test fmt tidy
+
+build:
+	@$(GO) build ./...
+
+test:
+	@$(GO) test ./...
+
+fmt:
+	@$(GO) fmt ./...
+
+tidy:
+	@$(GO) mod tidy
+"#
+    } else {
+        r#"GO ?= go
+
+.PHONY: run build test fmt tidy
+
+run:
+	@$(GO) run .
+
+build:
+	@$(GO) build .
+
+test:
+	@$(GO) test ./...
+
+fmt:
+	@$(GO) fmt ./...
+
+tidy:
+	@$(GO) mod tidy
+"#
+    }
 }

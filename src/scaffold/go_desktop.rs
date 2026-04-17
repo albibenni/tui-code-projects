@@ -14,8 +14,31 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     write_file(base, "README.md", &readme(framework))?;
     write_file(base, "go.mod", go_mod())?;
     write_file(base, "main.go", main_go(framework))?;
+    write_file(base, "Makefile", makefile())?;
 
     Ok(())
+}
+
+fn makefile() -> &'static str {
+    r#"GO ?= go
+
+.PHONY: run build test fmt tidy
+
+run:
+	@$(GO) run .
+
+build:
+	@$(GO) build .
+
+test:
+	@$(GO) test ./...
+
+fmt:
+	@$(GO) fmt ./...
+
+tidy:
+	@$(GO) mod tidy
+"#
 }
 
 fn readme(framework: &str) -> String {

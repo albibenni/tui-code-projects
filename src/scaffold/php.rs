@@ -33,6 +33,12 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
         }
     }
 
+    write_file(
+        base,
+        "Makefile",
+        makefile(project_type, dep_manager == "Composer"),
+    )?;
+
     Ok(())
 }
 
@@ -98,5 +104,78 @@ echo "Symfony placeholder";
 "#
         .to_string(),
         _ => "<?php\n\necho \"Hello World!\";\n".to_string(),
+    }
+}
+
+fn makefile(project_type: &str, use_composer: bool) -> &'static str {
+    match (project_type, use_composer) {
+        ("Web API", true) => {
+            r#"PHP ?= php
+COMPOSER ?= composer
+
+.PHONY: install run test lint
+
+install:
+	@$(COMPOSER) install
+
+run:
+	@$(PHP) -S localhost:8000 -t public
+
+test:
+	@$(PHP) -v
+
+lint:
+	@find . -name "*.php" -print0 | xargs -0 -n1 $(PHP) -l
+"#
+        }
+        ("Web API", false) => {
+            r#"PHP ?= php
+
+.PHONY: run test lint
+
+run:
+	@$(PHP) -S localhost:8000 -t public
+
+test:
+	@$(PHP) -v
+
+lint:
+	@find . -name "*.php" -print0 | xargs -0 -n1 $(PHP) -l
+"#
+        }
+        (_, true) => {
+            r#"PHP ?= php
+COMPOSER ?= composer
+
+.PHONY: install run test lint
+
+install:
+	@$(COMPOSER) install
+
+run:
+	@$(PHP) index.php
+
+test:
+	@$(PHP) -v
+
+lint:
+	@find . -name "*.php" -print0 | xargs -0 -n1 $(PHP) -l
+"#
+        }
+        _ => {
+            r#"PHP ?= php
+
+.PHONY: run test lint
+
+run:
+	@$(PHP) index.php
+
+test:
+	@$(PHP) -v
+
+lint:
+	@find . -name "*.php" -print0 | xargs -0 -n1 $(PHP) -l
+"#
+        }
     }
 }
