@@ -22,7 +22,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
 fn makefile() -> &'static str {
     r#"CARGO ?= cargo
 
-.PHONY: build run test fmt clippy coverage
+.PHONY: build run test fmt lint clippy coverage
 
 build:
 	@$(CARGO) build
@@ -35,6 +35,9 @@ test:
 
 fmt:
 	@$(CARGO) fmt
+
+lint:
+	@$(CARGO) clippy --all-targets --all-features -- -D warnings
 
 clippy:
 	@$(CARGO) clippy --all-targets --all-features -- -D warnings

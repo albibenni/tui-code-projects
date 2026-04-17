@@ -95,7 +95,7 @@ fn makefile(project_name: &str) -> String {
     let test_bundle = format!("{project_name}PackageTests");
     let template = "SWIFT ?= swift
 
-.PHONY: build run test fmt coverage
+.PHONY: build run test fmt lint coverage
 
 build:
 \t@$(SWIFT) build
@@ -108,6 +108,9 @@ test:
 
 fmt:
 \t@$(SWIFT) format --in-place --recursive Sources Tests || true
+
+lint:
+\t@$(SWIFT) format lint --recursive Sources Tests || true
 
 coverage:
 \t@rm -rf .build/coverage-home .build/coverage-main .build/coverage-merged

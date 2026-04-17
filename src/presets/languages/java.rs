@@ -1,43 +1,47 @@
+use super::shared::git_hooks_general_step;
 use super::types::{Category, Choice, Language, OptionStep};
 
 pub fn java_language() -> Language {
     Language {
         name: "Java",
         category: Category::Backend,
-        steps: vec![OptionStep {
-            title: "Project Type",
-            choices: vec![
-                Choice {
-                    name: "CLI",
-                    description: "Command-line application",
-                    follow_up: vec![build_tool_step()],
-                },
-                Choice {
-                    name: "Web API",
-                    description: "HTTP server application",
-                    follow_up: vec![OptionStep {
-                        title: "Framework",
-                        choices: vec![
-                            Choice {
-                                name: "Spring Boot",
-                                description: "Enterprise-ready Java framework",
-                                follow_up: vec![build_tool_step()],
-                            },
-                            Choice {
-                                name: "Micronaut",
-                                description: "Lightweight JVM microservice framework",
-                                follow_up: vec![build_tool_step()],
-                            },
-                            Choice {
-                                name: "Javalin",
-                                description: "Simple, lightweight web framework",
-                                follow_up: vec![build_tool_step()],
-                            },
-                        ],
-                    }],
-                },
-            ],
-        }],
+        steps: vec![
+            OptionStep {
+                title: "Project Type",
+                choices: vec![
+                    Choice {
+                        name: "CLI",
+                        description: "Command-line application",
+                        follow_up: vec![build_tool_step()],
+                    },
+                    Choice {
+                        name: "Web API",
+                        description: "HTTP server application",
+                        follow_up: vec![OptionStep {
+                            title: "Framework",
+                            choices: vec![
+                                Choice {
+                                    name: "Spring Boot",
+                                    description: "Enterprise-ready Java framework",
+                                    follow_up: vec![build_tool_step()],
+                                },
+                                Choice {
+                                    name: "Micronaut",
+                                    description: "Lightweight JVM microservice framework",
+                                    follow_up: vec![build_tool_step()],
+                                },
+                                Choice {
+                                    name: "Javalin",
+                                    description: "Simple, lightweight web framework",
+                                    follow_up: vec![build_tool_step()],
+                                },
+                            ],
+                        }],
+                    },
+                ],
+            },
+            git_hooks_general_step(),
+        ],
     }
 }
 

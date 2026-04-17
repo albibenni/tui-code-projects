@@ -22,7 +22,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
 fn makefile() -> &'static str {
     r#"GO ?= go
 
-.PHONY: run build test fmt tidy
+.PHONY: run build test fmt lint tidy
 
 run:
 	@$(GO) run .
@@ -35,6 +35,9 @@ test:
 
 fmt:
 	@$(GO) fmt ./...
+
+lint:
+	@$(GO) vet ./...
 
 tidy:
 	@$(GO) mod tidy

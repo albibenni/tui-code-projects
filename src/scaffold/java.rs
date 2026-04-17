@@ -41,7 +41,7 @@ fn makefile(build_tool: &str) -> &'static str {
         "Gradle" => {
             r#"GRADLE ?= gradle
 
-.PHONY: build run test clean
+.PHONY: build run test lint clean
 
 build:
 	@$(GRADLE) build
@@ -52,6 +52,9 @@ run:
 test:
 	@$(GRADLE) test
 
+lint:
+	@echo "No linter configured for this Java preset."
+
 clean:
 	@$(GRADLE) clean
 "#
@@ -59,7 +62,7 @@ clean:
         _ => {
             r#"MAVEN ?= mvn
 
-.PHONY: build run test clean
+.PHONY: build run test lint clean
 
 build:
 	@$(MAVEN) -q package
@@ -69,6 +72,9 @@ run:
 
 test:
 	@$(MAVEN) -q test
+
+lint:
+	@echo "No linter configured for this Java preset."
 
 clean:
 	@$(MAVEN) -q clean

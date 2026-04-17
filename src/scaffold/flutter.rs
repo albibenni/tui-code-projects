@@ -112,7 +112,7 @@ fn send(tx: &Sender<String>, msg: impl Into<String>) {
 fn makefile() -> &'static str {
     r#"FLUTTER ?= flutter
 
-.PHONY: setup run test analyze clean
+.PHONY: setup run test lint analyze clean
 
 setup:
 	@$(FLUTTER) pub get
@@ -122,6 +122,9 @@ run:
 
 test:
 	@$(FLUTTER) test
+
+lint:
+	@$(FLUTTER) analyze
 
 analyze:
 	@$(FLUTTER) analyze

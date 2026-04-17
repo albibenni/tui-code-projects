@@ -1,25 +1,26 @@
-use super::shared::eslint_backend_step;
+use super::shared::{eslint_backend_step, git_hooks_ts_step};
 use super::types::{Category, Choice, Language, OptionStep};
 
 fn pm_node_backend() -> OptionStep {
     let eslint = eslint_backend_step();
+    let hooks = git_hooks_ts_step();
     OptionStep {
         title: "Package Manager",
         choices: vec![
             Choice {
                 name: "npm",
                 description: "Default Node.js package manager",
-                follow_up: vec![eslint.clone()],
+                follow_up: vec![eslint.clone(), hooks.clone()],
             },
             Choice {
                 name: "pnpm",
                 description: "Fast, disk-efficient package manager",
-                follow_up: vec![eslint.clone()],
+                follow_up: vec![eslint.clone(), hooks.clone()],
             },
             Choice {
                 name: "yarn",
                 description: "Reliable JavaScript package manager",
-                follow_up: vec![eslint],
+                follow_up: vec![eslint, hooks],
             },
         ],
     }
@@ -27,23 +28,24 @@ fn pm_node_backend() -> OptionStep {
 
 fn pm_bun_backend() -> OptionStep {
     let eslint = eslint_backend_step();
+    let hooks = git_hooks_ts_step();
     OptionStep {
         title: "Package Manager",
         choices: vec![
             Choice {
                 name: "bun",
                 description: "Bun's built-in package manager",
-                follow_up: vec![eslint.clone()],
+                follow_up: vec![eslint.clone(), hooks.clone()],
             },
             Choice {
                 name: "npm",
                 description: "Node.js package manager",
-                follow_up: vec![eslint.clone()],
+                follow_up: vec![eslint.clone(), hooks.clone()],
             },
             Choice {
                 name: "pnpm",
                 description: "Fast, disk-efficient package manager",
-                follow_up: vec![eslint],
+                follow_up: vec![eslint, hooks],
             },
         ],
     }
@@ -51,23 +53,24 @@ fn pm_bun_backend() -> OptionStep {
 
 fn pm_deno_backend() -> OptionStep {
     let eslint = eslint_backend_step();
+    let hooks = git_hooks_ts_step();
     OptionStep {
         title: "Package Manager",
         choices: vec![
             Choice {
                 name: "deno",
                 description: "Deno's built-in package manager",
-                follow_up: vec![eslint.clone()],
+                follow_up: vec![eslint.clone(), hooks.clone()],
             },
             Choice {
                 name: "npm",
                 description: "Node.js package manager",
-                follow_up: vec![eslint.clone()],
+                follow_up: vec![eslint.clone(), hooks.clone()],
             },
             Choice {
                 name: "pnpm",
                 description: "Fast, disk-efficient package manager",
-                follow_up: vec![eslint],
+                follow_up: vec![eslint, hooks],
             },
         ],
     }

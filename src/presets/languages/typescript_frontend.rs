@@ -1,5 +1,24 @@
-use super::shared::pm_js;
+use super::shared::{git_hooks_ts_step, pm_js};
 use super::types::{Category, Choice, Language, OptionStep};
+
+fn angular_pm_step() -> OptionStep {
+    let hooks = git_hooks_ts_step();
+    OptionStep {
+        title: "Package Manager",
+        choices: vec![
+            Choice {
+                name: "npm",
+                description: "Default Node.js package manager",
+                follow_up: vec![hooks.clone()],
+            },
+            Choice {
+                name: "pnpm",
+                description: "Fast, disk-efficient package manager",
+                follow_up: vec![hooks],
+            },
+        ],
+    }
+}
 
 pub fn typescript_frontend_language() -> Language {
     Language {
@@ -78,21 +97,7 @@ pub fn typescript_frontend_language() -> Language {
                 Choice {
                     name: "Angular",
                     description: "Platform for building web applications",
-                    follow_up: vec![OptionStep {
-                        title: "Package Manager",
-                        choices: vec![
-                            Choice {
-                                name: "npm",
-                                description: "Default Node.js package manager",
-                                follow_up: vec![],
-                            },
-                            Choice {
-                                name: "pnpm",
-                                description: "Fast, disk-efficient package manager",
-                                follow_up: vec![],
-                            },
-                        ],
-                    }],
+                    follow_up: vec![angular_pm_step()],
                 },
                 Choice {
                     name: "Astro",

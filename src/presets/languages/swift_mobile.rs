@@ -1,17 +1,21 @@
+use super::shared::git_hooks_general_step;
 use super::types::{Category, Choice, Language, OptionStep};
 
 pub fn swift_mobile_language() -> Language {
     Language {
         name: "Swift (Mobile)",
         category: Category::Mobile,
-        steps: vec![OptionStep {
-            title: "Target",
-            choices: vec![Choice {
-                name: "iOS App",
-                description: "Native iPhone/iPad application",
-                follow_up: vec![ui_framework_step()],
-            }],
-        }],
+        steps: vec![
+            OptionStep {
+                title: "Target",
+                choices: vec![Choice {
+                    name: "iOS App",
+                    description: "Native iPhone/iPad application",
+                    follow_up: vec![ui_framework_step()],
+                }],
+            },
+            git_hooks_general_step(),
+        ],
     }
 }
 

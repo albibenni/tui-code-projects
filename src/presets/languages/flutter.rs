@@ -1,3 +1,4 @@
+use super::shared::git_hooks_general_step;
 use super::types::{Category, Choice, Language, OptionStep};
 
 pub fn flutter_language() -> Language {
@@ -55,6 +56,7 @@ pub fn flutter_language() -> Language {
                     },
                 ],
             },
+            git_hooks_general_step(),
         ],
     }
 }

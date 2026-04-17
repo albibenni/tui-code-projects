@@ -129,7 +129,7 @@ fn makefile(project_type: &str) -> &'static str {
     if project_type == "Library" {
         r#"GO ?= go
 
-.PHONY: build test fmt tidy
+.PHONY: build test fmt lint tidy
 
 build:
 	@$(GO) build ./...
@@ -140,13 +140,16 @@ test:
 fmt:
 	@$(GO) fmt ./...
 
+lint:
+	@$(GO) vet ./...
+
 tidy:
 	@$(GO) mod tidy
 "#
     } else {
         r#"GO ?= go
 
-.PHONY: run build test fmt tidy
+.PHONY: run build test fmt lint tidy
 
 run:
 	@$(GO) run .
@@ -159,6 +162,9 @@ test:
 
 fmt:
 	@$(GO) fmt ./...
+
+lint:
+	@$(GO) vet ./...
 
 tidy:
 	@$(GO) mod tidy

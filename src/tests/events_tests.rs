@@ -206,7 +206,11 @@ fn options_down_does_not_go_past_last() {
 fn options_enter_on_leaf_advances_to_config() {
     let mut app = at_options_step(Category::Backend, 0); // Rust — Binary has no follow_up
     app.option_list_state.select(Some(0)); // Binary
-    app.handle_key(press(KeyCode::Enter));
+    app.handle_key(press(KeyCode::Enter)); // advance to Git Hooks
+    assert_eq!(app.step, Step::Options);
+    assert_eq!(app.current_option_step().unwrap().title, "Git Hooks");
+    app.option_list_state.select(Some(0)); // None
+    app.handle_key(press(KeyCode::Enter)); // advance to Config
     assert_eq!(app.step, Step::Config);
 }
 
@@ -216,9 +220,9 @@ fn options_enter_on_choice_with_follow_up_stays_in_options() {
     app.option_list_state.select(Some(2)); // Web API — has follow_up Framework step
     app.handle_key(press(KeyCode::Enter));
     assert_eq!(app.step, Step::Options);
-    assert_eq!(app.option_steps.len(), 2);
+    assert_eq!(app.option_steps.len(), 3);
     assert_eq!(app.option_step_index, 1);
-    assert_eq!(app.option_steps[1].title, "Framework");
+    assert!(app.option_steps.iter().any(|s| s.title == "Framework"));
 }
 
 #[test]
@@ -237,7 +241,7 @@ fn options_back_restores_previous_selection_and_removes_follow_up() {
     app.handle_key(press(KeyCode::Esc)); // go back
     assert_eq!(app.option_step_index, 0);
     assert_eq!(app.option_list_state.selected(), Some(2)); // restored
-    assert_eq!(app.option_steps.len(), 1); // follow_up removed
+    assert_eq!(app.option_steps.len(), 2); // follow_up removed
 }
 
 #[test]

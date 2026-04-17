@@ -1,24 +1,28 @@
+use super::shared::git_hooks_general_step;
 use super::types::{Category, Choice, Language, OptionStep};
 
 pub fn kotlin_mobile_language() -> Language {
     Language {
         name: "Kotlin (Mobile)",
         category: Category::Mobile,
-        steps: vec![OptionStep {
-            title: "UI Toolkit",
-            choices: vec![
-                Choice {
-                    name: "Jetpack Compose",
-                    description: "Modern declarative Android UI toolkit",
-                    follow_up: vec![build_tool_step()],
-                },
-                Choice {
-                    name: "XML Views",
-                    description: "Traditional Android view system",
-                    follow_up: vec![build_tool_step()],
-                },
-            ],
-        }],
+        steps: vec![
+            OptionStep {
+                title: "UI Toolkit",
+                choices: vec![
+                    Choice {
+                        name: "Jetpack Compose",
+                        description: "Modern declarative Android UI toolkit",
+                        follow_up: vec![build_tool_step()],
+                    },
+                    Choice {
+                        name: "XML Views",
+                        description: "Traditional Android view system",
+                        follow_up: vec![build_tool_step()],
+                    },
+                ],
+            },
+            git_hooks_general_step(),
+        ],
     }
 }
 

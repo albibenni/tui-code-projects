@@ -1,23 +1,24 @@
 use super::types::{Choice, OptionStep};
 
 pub fn pm_js() -> OptionStep {
+    let hooks = git_hooks_ts_step();
     OptionStep {
         title: "Package Manager",
         choices: vec![
             Choice {
                 name: "npm",
                 description: "Default Node.js package manager",
-                follow_up: vec![],
+                follow_up: vec![hooks.clone()],
             },
             Choice {
                 name: "pnpm",
                 description: "Fast, disk-efficient package manager",
-                follow_up: vec![],
+                follow_up: vec![hooks.clone()],
             },
             Choice {
                 name: "bun",
                 description: "Fast JavaScript all-in-one toolkit",
-                follow_up: vec![],
+                follow_up: vec![hooks],
             },
         ],
     }
@@ -68,6 +69,47 @@ pub fn eslint_backend_step() -> OptionStep {
             Choice {
                 name: "Custom Strict",
                 description: "Full preset: eslint.config.js + tsconfig.json + .prettierrc",
+                follow_up: vec![],
+            },
+        ],
+    }
+}
+
+pub fn git_hooks_ts_step() -> OptionStep {
+    OptionStep {
+        title: "Git Hooks",
+        choices: vec![
+            Choice {
+                name: "None",
+                description: "Do not configure pre-commit hooks",
+                follow_up: vec![],
+            },
+            Choice {
+                name: "Husky (lint + test)",
+                description: "Use Husky pre-commit to run lint and test",
+                follow_up: vec![],
+            },
+        ],
+    }
+}
+
+pub fn git_hooks_general_step() -> OptionStep {
+    OptionStep {
+        title: "Git Hooks",
+        choices: vec![
+            Choice {
+                name: "None",
+                description: "Do not configure pre-commit hooks",
+                follow_up: vec![],
+            },
+            Choice {
+                name: "Native Git Hook (make lint && make test)",
+                description: "Use .git/hooks/pre-commit with Makefile targets",
+                follow_up: vec![],
+            },
+            Choice {
+                name: "Lefthook (lint + test)",
+                description: "Use Lefthook pre-commit config for lint and test",
                 follow_up: vec![],
             },
         ],
