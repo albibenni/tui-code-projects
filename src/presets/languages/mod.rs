@@ -2,6 +2,8 @@ mod flutter;
 mod get_languages;
 mod go;
 mod go_desktop;
+mod java;
+mod php;
 mod python;
 mod python_desktop;
 mod rust;

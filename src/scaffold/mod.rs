@@ -1,7 +1,9 @@
 mod command;
 mod flutter;
 mod go;
+mod java;
 mod params;
+mod php;
 mod python;
 mod run;
 mod rust;

@@ -31,6 +31,8 @@ fn backend_languages_are_correct() {
 
     assert!(langs.contains(&"Rust"));
     assert!(langs.contains(&"Go"));
+    assert!(langs.contains(&"Java"));
+    assert!(langs.contains(&"PHP"));
     assert!(langs.contains(&"Python"));
     assert!(langs.contains(&"TypeScript (Backend)"));
 }
