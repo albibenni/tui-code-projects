@@ -2,18 +2,25 @@
 pub enum Category {
     Backend,
     Frontend,
+    Mobile,
     Desktop,
 }
 
 impl Category {
     pub fn all() -> Vec<Category> {
-        vec![Category::Backend, Category::Frontend, Category::Desktop]
+        vec![
+            Category::Backend,
+            Category::Frontend,
+            Category::Mobile,
+            Category::Desktop,
+        ]
     }
 
     pub fn label(&self) -> &'static str {
         match self {
             Category::Backend => "Backend",
             Category::Frontend => "Frontend",
+            Category::Mobile => "Mobile",
             Category::Desktop => "Desktop",
         }
     }
