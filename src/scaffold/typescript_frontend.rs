@@ -11,13 +11,29 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
 
     match framework {
         "React" => scaffold_react(base, variant, pm, tx),
-        "Vue" => scaffold_vite(base, "vue-ts", pm, tx),
+        "Vue" => scaffold_vue(base, variant, pm, tx),
         "Svelte" => scaffold_svelte(base, variant, pm, tx),
         "Angular" => scaffold_angular(base, pm, tx),
         "Astro" => scaffold_astro(base, pm, tx),
         "Qwik" => scaffold_qwik(base, pm, tx),
         "Solid" => scaffold_vite(base, "solid-ts", pm, tx),
         _ => Ok(()),
+    }
+}
+
+fn scaffold_vue(
+    base: &Path,
+    variant: Option<&str>,
+    pm: &str,
+    tx: &Sender<String>,
+) -> Result<(), String> {
+    match variant {
+        Some("Nuxt") => {
+            send(tx, "Running nuxi init...");
+            run_in(base, "npx", &["nuxi@latest", "init", "."], tx)?;
+            install_deps(base, pm, tx)
+        }
+        _ => scaffold_vite(base, "vue-ts", pm, tx),
     }
 }
 
@@ -53,7 +69,8 @@ fn scaffold_react(
                 "npx",
                 &["create-remix@latest", ".", "--no-install"],
                 tx,
-            )
+            )?;
+            install_deps(base, pm, tx)
         }
         Some("Expo") => {
             send(tx, "Running create-expo-app...");
@@ -119,7 +136,8 @@ fn scaffold_vite(base: &Path, template: &str, pm: &str, tx: &Sender<String>) -> 
             vec!["create", "vite@latest", ".", "--", "--template", template],
         ),
     };
-    run_in(base, prog, &args, tx)
+    run_in(base, prog, &args, tx)?;
+    install_deps(base, pm, tx)
 }
 
 fn scaffold_angular(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
@@ -191,7 +209,8 @@ fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Stri
             ],
         ),
     };
-    run_in(base, prog, &args, tx)
+    run_in(base, prog, &args, tx)?;
+    install_deps(base, pm, tx)
 }
 
 fn scaffold_qwik(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
@@ -205,9 +224,38 @@ fn scaffold_qwik(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Strin
             vec!["create", "qwik@latest", ".", "--", "--no-install"],
         ),
     };
+    run_in(base, prog, &args, tx)?;
+    install_deps(base, pm, tx)
+}
+
+fn install_deps(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
+    let (prog, args) = install_command(pm);
+    send(tx, format!("Installing dependencies ({pm})..."));
     run_in(base, prog, &args, tx)
+}
+
+fn install_command(pm: &str) -> (&str, Vec<&'static str>) {
+    match pm {
+        "pnpm" => ("pnpm", vec!["install"]),
+        "yarn" => ("yarn", vec!["install"]),
+        "bun" => ("bun", vec!["install"]),
+        _ => ("npm", vec!["install"]),
+    }
 }
 
 fn send(tx: &Sender<String>, msg: impl Into<String>) {
     let _ = tx.send(msg.into());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::install_command;
+
+    #[test]
+    fn install_command_maps_package_managers() {
+        assert_eq!(install_command("npm"), ("npm", vec!["install"]));
+        assert_eq!(install_command("pnpm"), ("pnpm", vec!["install"]));
+        assert_eq!(install_command("yarn"), ("yarn", vec!["install"]));
+        assert_eq!(install_command("bun"), ("bun", vec!["install"]));
+    }
 }

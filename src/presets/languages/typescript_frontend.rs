@@ -40,7 +40,21 @@ pub fn typescript_frontend_language() -> Language {
                 Choice {
                     name: "Vue",
                     description: "Progressive JavaScript framework",
-                    follow_up: vec![pm_js()],
+                    follow_up: vec![OptionStep {
+                        title: "Variant",
+                        choices: vec![
+                            Choice {
+                                name: "Vite",
+                                description: "Fast SPA setup with Vite",
+                                follow_up: vec![pm_js()],
+                            },
+                            Choice {
+                                name: "Nuxt",
+                                description: "Full-stack Vue framework",
+                                follow_up: vec![pm_js()],
+                            },
+                        ],
+                    }],
                 },
                 Choice {
                     name: "Svelte",
