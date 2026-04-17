@@ -28,12 +28,12 @@ fn readme(ui: &str, core: &str) -> String {
 fn package_swift(ui: &str) -> &'static str {
     match ui {
         "AppKit" => {
-            r#"// swift-tools-version: 5.9
+            r#"// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
     name: "DesktopApp",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS(.v15)],
     targets: [
         .executableTarget(name: "DesktopApp")
     ]
@@ -41,12 +41,12 @@ let package = Package(
 "#
         }
         _ => {
-            r#"// swift-tools-version: 5.9
+            r#"// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
     name: "DesktopApp",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS(.v15)],
     targets: [
         .executableTarget(name: "DesktopApp")
     ]

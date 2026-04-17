@@ -9,6 +9,7 @@ use super::python_desktop::python_desktop_language;
 use super::rust::rust_language;
 use super::rust_desktop::rust_desktop_language;
 use super::swift::swift_language;
+use super::swift_mobile::swift_mobile_language;
 use super::types::Language;
 use super::typescript_backend::typescript_backend_language;
 use super::typescript_frontend::typescript_frontend_language;
@@ -24,6 +25,7 @@ pub fn get_languages() -> Vec<Language> {
         typescript_frontend_language(),
         flutter_language(),
         kotlin_mobile_language(),
+        swift_mobile_language(),
         swift_language(),
         rust_desktop_language(),
         go_desktop_language(),

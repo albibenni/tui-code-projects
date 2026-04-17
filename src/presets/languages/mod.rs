@@ -11,6 +11,7 @@ mod rust;
 mod rust_desktop;
 mod shared;
 mod swift;
+mod swift_mobile;
 pub mod types;
 mod typescript_backend;
 mod typescript_frontend;
