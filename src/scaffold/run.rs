@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
+use std::process::Command;
 use std::sync::mpsc::Sender;
 
 use crate::config::validate_project_name;
@@ -44,6 +45,29 @@ fn execute(params: &ScaffoldParams, tx: &Sender<String>) -> Result<(), String> {
         _ => {}
     }
 
+    ensure_git_repo(&base, tx);
+
     let _ = tx.send(format!("Done — project created at {}", base.display()));
     Ok(())
+}
+
+fn ensure_git_repo(base: &PathBuf, tx: &Sender<String>) {
+    if base.join(".git").exists() {
+        return;
+    }
+
+    let _ = tx.send("Initializing git repository...".to_string());
+
+    match Command::new("git").arg("init").current_dir(base).status() {
+        Ok(status) if status.success() => {}
+        Ok(status) => {
+            let _ = tx.send(format!(
+                "Warning: `git init` failed with exit code {:?}",
+                status.code()
+            ));
+        }
+        Err(e) => {
+            let _ = tx.send(format!("Warning: failed to run `git init`: {e}"));
+        }
+    }
 }
