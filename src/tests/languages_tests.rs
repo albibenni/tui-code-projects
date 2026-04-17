@@ -47,6 +47,17 @@ fn frontend_languages_are_correct() {
 }
 
 #[test]
+fn mobile_languages_are_correct() {
+    let langs: Vec<_> = get_languages()
+        .into_iter()
+        .filter(|l| l.category == Category::Mobile)
+        .map(|l| l.name)
+        .collect();
+
+    assert!(langs.contains(&"Flutter"));
+}
+
+#[test]
 fn desktop_languages_are_correct() {
     let langs: Vec<_> = get_languages()
         .into_iter()
