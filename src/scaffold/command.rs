@@ -8,6 +8,8 @@ pub fn run_in(dir: &Path, program: &str, args: &[&str], tx: &Sender<String>) -> 
     let mut child = Command::new(program)
         .args(args)
         .current_dir(dir)
+        .stdin(Stdio::null())
+        .env("CI", "true")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
