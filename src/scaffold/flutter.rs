@@ -17,7 +17,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     run_in(
         base,
         "flutter",
-        &["create", ".", "--platforms", platforms],
+        &["create", ".", "--platforms", platforms, "--overwrite"],
         tx,
     )?;
 
