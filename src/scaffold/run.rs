@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::sync::mpsc::Sender;
 
 use crate::config::validate_project_name;
@@ -60,7 +60,13 @@ fn ensure_git_repo(base: &PathBuf, tx: &Sender<String>) {
 
     let _ = tx.send("Initializing git repository...".to_string());
 
-    match Command::new("git").arg("init").current_dir(base).status() {
+    match Command::new("git")
+        .arg("init")
+        .current_dir(base)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+    {
         Ok(status) if status.success() => {}
         Ok(status) => {
             let _ = tx.send(format!(
@@ -136,6 +142,8 @@ fi
     let status = Command::new("git")
         .args(["config", "core.hooksPath", ".husky"])
         .current_dir(base)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
         .status()
         .map_err(|e| format!("Failed to run `git config core.hooksPath .husky`: {e}"))?;
 
