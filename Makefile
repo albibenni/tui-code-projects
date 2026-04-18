@@ -1,4 +1,4 @@
-.PHONY: all build test coverage clean run check help
+.PHONY: all build test coverage clean run check help install
 
 all: build
 
@@ -16,6 +16,9 @@ check:
 
 test:
 	cargo test
+
+install:
+	./scripts/install.sh
 
 coverage:
 	@command -v cargo-llvm-cov >/dev/null 2>&1 || (echo "cargo-llvm-cov is required. Install with: cargo install cargo-llvm-cov"; exit 1)
@@ -38,4 +41,5 @@ help:
 	@echo "  test      Run all tests"
 	@echo "  coverage  Print per-file and total coverage (lines/regions/functions) to stdout"
 	@echo "  clean     Remove build artifacts"
+	@echo "  install   Install the binary and setup an alias"
 	@echo "  help      Show this message"
