@@ -62,6 +62,7 @@ fn ensure_git_repo(base: &PathBuf, tx: &Sender<String>) {
 
     match Command::new("git")
         .arg("init")
+        .arg("-q")
         .current_dir(base)
         .stdout(Stdio::null())
         .stderr(Stdio::null())

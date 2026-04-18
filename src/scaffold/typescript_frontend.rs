@@ -30,7 +30,7 @@ fn scaffold_vue(
     match variant {
         Some("Nuxt") => {
             send(tx, "Running nuxi init...");
-            run_in(base, "npx", &["nuxi@latest", "init", "."], tx)?;
+            run_in(base, "npx", &["nuxi@latest", "init", ".", "--force"], tx)?;
             install_deps(base, pm, tx)
         }
         _ => scaffold_vite(base, "vue-ts", pm, tx),
@@ -58,6 +58,7 @@ fn scaffold_react(
                     "--no-src-dir",
                     "--no-app",
                     &format!("--use-{pm}"),
+                    "--yes",
                 ],
                 tx,
             )
@@ -67,7 +68,7 @@ fn scaffold_react(
             run_in(
                 base,
                 "npx",
-                &["create-remix@latest", ".", "--no-install"],
+                &["create-remix@latest", ".", "--no-install", "--yes"],
                 tx,
             )?;
             install_deps(base, pm, tx)
@@ -82,6 +83,7 @@ fn scaffold_react(
                     ".",
                     "--template",
                     "blank-typescript",
+                    "--yes",
                 ],
                 tx,
             )
@@ -124,16 +126,16 @@ fn scaffold_vite(base: &Path, template: &str, pm: &str, tx: &Sender<String>) -> 
     let (prog, args): (&str, Vec<&str>) = match pm {
         "pnpm" => (
             "pnpm",
-            vec!["create", "vite@latest", ".", "--template", template],
+            vec!["create", "vite@latest", ".", "--template", template, "--yes"],
         ),
-        "yarn" => ("yarn", vec!["create", "vite", ".", "--template", template]),
+        "yarn" => ("yarn", vec!["create", "vite", ".", "--template", template, "--yes"]),
         "bun" => (
             "bun",
-            vec!["create", "vite@latest", ".", "--template", template],
+            vec!["create", "vite@latest", ".", "--template", template, "--yes"],
         ),
         _ => (
             "npm",
-            vec!["create", "vite@latest", ".", "--", "--template", template],
+            vec!["create", "vite@latest", ".", "--yes", "--", "--template", template],
         ),
     };
     run_in(base, prog, &args, tx)?;
@@ -169,6 +171,7 @@ fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Stri
                 "minimal",
                 "--no-install",
                 "--no-git",
+                "--yes",
             ],
         ),
         "yarn" => (
@@ -181,6 +184,7 @@ fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Stri
                 "minimal",
                 "--no-install",
                 "--no-git",
+                "--yes",
             ],
         ),
         "bun" => (
@@ -193,6 +197,7 @@ fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Stri
                 "minimal",
                 "--no-install",
                 "--no-git",
+                "--yes",
             ],
         ),
         _ => (
@@ -201,6 +206,7 @@ fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Stri
                 "create",
                 "astro@latest",
                 ".",
+                "--yes",
                 "--",
                 "--template",
                 "minimal",
@@ -216,12 +222,18 @@ fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Stri
 fn scaffold_qwik(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     send(tx, "Running create-qwik...");
     let (prog, args): (&str, Vec<&str>) = match pm {
-        "pnpm" => ("pnpm", vec!["create", "qwik@latest", ".", "--no-install"]),
-        "yarn" => ("yarn", vec!["create", "qwik", ".", "--no-install"]),
-        "bun" => ("bun", vec!["create", "qwik@latest", ".", "--no-install"]),
+        "pnpm" => (
+            "pnpm",
+            vec!["create", "qwik@latest", ".", "--no-install", "--yes"],
+        ),
+        "yarn" => ("yarn", vec!["create", "qwik", ".", "--no-install", "--yes"]),
+        "bun" => (
+            "bun",
+            vec!["create", "qwik@latest", ".", "--no-install", "--yes"],
+        ),
         _ => (
             "npm",
-            vec!["create", "qwik@latest", ".", "--", "--no-install"],
+            vec!["create", "qwik@latest", ".", "--yes", "--", "--no-install"],
         ),
     };
     run_in(base, prog, &args, tx)?;
