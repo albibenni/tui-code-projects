@@ -14,6 +14,7 @@ mod swift;
 mod swift_mobile;
 pub mod types;
 mod typescript_backend;
+mod typescript_desktop;
 mod typescript_frontend;
 
 pub use get_languages::get_languages;

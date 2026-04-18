@@ -12,6 +12,7 @@ use super::swift::swift_language;
 use super::swift_mobile::swift_mobile_language;
 use super::types::Language;
 use super::typescript_backend::typescript_backend_language;
+use super::typescript_desktop::typescript_desktop_language;
 use super::typescript_frontend::typescript_frontend_language;
 
 pub fn get_languages() -> Vec<Language> {
@@ -23,6 +24,7 @@ pub fn get_languages() -> Vec<Language> {
         python_language(),
         typescript_backend_language(),
         typescript_frontend_language(),
+        typescript_desktop_language(),
         flutter_language(),
         kotlin_mobile_language(),
         swift_mobile_language(),

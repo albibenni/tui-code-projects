@@ -14,6 +14,7 @@ mod rust_desktop;
 mod swift_desktop;
 mod swift_mobile;
 mod typescript_backend;
+mod typescript_desktop;
 mod typescript_frontend;
 pub mod writer;
 
