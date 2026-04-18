@@ -24,69 +24,113 @@ fn scaffold_electron(
 ) -> Result<(), String> {
     let name = &params.project_name;
 
+    // 1. Create directory structure
+    let src_dir = base.join("src");
+    std::fs::create_dir_all(&src_dir).map_err(|e| format!("Failed to create src/: {e}"))?;
+
+    // 2. package.json
     let package_json = format!(
         r#"{{
   "name": "{name}",
   "version": "0.1.0",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {{
-    "start": "electron ."
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "npm run build && electron .",
+    "dev": "concurrently \"npm run watch\" \"electron .\""
   }},
   "devDependencies": {{
-    "electron": "latest"
+    "electron": "latest",
+    "typescript": "latest",
+    "concurrently": "latest"
   }}
 }}
 "#
     );
 
-    send(tx, "Writing package.json...");
-    writer::write_file(base, "package.json", &package_json)?;
+    // 3. tsconfig.json
+    let tsconfig = r#"{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"]
+}
+"#;
 
-    let main_js = r#"const { app, BrowserWindow } = require('electron')
+    // 4. src/main.ts
+    let main_ts = r#"import { app, BrowserWindow } from 'electron';
+import * as path from 'path';
 
-function createWindow () {
+function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
     }
-  })
+  });
 
-  win.loadFile('index.html')
+  win.loadFile('index.html');
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
+  if (process.platform !== 'darwin') app.quit();
+});
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
-})
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
 "#;
 
+    // 5. src/preload.ts (The secure bridge)
+    let preload_ts = r#"import { contextBridge } from 'electron';
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  platform: process.platform,
+  version: process.versions.electron
+});
+"#;
+
+    // 6. index.html
     let index_html = r#"<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello Electron!</title>
+    <title>Hello Electron + TS!</title>
+    <style>
+      body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+    </style>
   </head>
   <body>
-    <h1>Hello Electron!</h1>
-    <p>Build something amazing.</p>
+    <h1>Hello Electron + TypeScript!</h1>
+    <p>Security: Preload script is active.</p>
+    <div id="info"></div>
+    <script>
+      const info = document.getElementById('info');
+      info.innerText = `Running on ${window.electronAPI.platform} (Electron v${window.electronAPI.version})`;
+    </script>
   </body>
 </html>
 "#;
 
-    send(tx, "Writing Electron starter files...");
-    writer::write_file(base, "main.js", main_js)?;
+    send(tx, "Writing configuration and source files...");
+    writer::write_file(base, "package.json", &package_json)?;
+    writer::write_file(base, "tsconfig.json", tsconfig)?;
     writer::write_file(base, "index.html", index_html)?;
+    writer::write_file(&src_dir, "main.ts", main_ts)?;
+    writer::write_file(&src_dir, "preload.ts", preload_ts)?;
 
     send(tx, format!("Running {pm} install..."));
     let (prog, args): (&str, &[&str]) = match pm {
