@@ -4,7 +4,7 @@
   - [ ] `test_cmd` and `lint_cmd` in hooks config, check if they exist and create them in makefile/package.json
   - [ ] add this command example to makefile files to add native hooks:
 
-``` bash
+```bash
 # Example setup command in your Makefile
 setup:
  cp scripts/pre-push-hook.sh .git/hooks/pre-push
@@ -14,3 +14,4 @@ setup:
 - [ ] Add a section on how to add new languages
 - [ ] makefile for common tasks like linting, testing, building, etc. for those who use makefiles
 - [ ] tests in typescript
+- [ ] add react tanstack
