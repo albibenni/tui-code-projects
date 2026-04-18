@@ -9,7 +9,7 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 echo "🚀 Installing $BINARY_NAME from $PROJECT_ROOT..."
 
 # 1. Install the binary
-if cargo install --path "$PROJECT_ROOT"; then
+if cargo install --path "$PROJECT_ROOT" --force; then
     echo "✅ Binary installed to ~/.cargo/bin/"
 else
     echo "❌ Failed to install binary. Make sure Rust/Cargo is installed."
@@ -48,7 +48,7 @@ esac
 if [ -n "$CONFIG_FILE" ]; then
     # Expand ~ to full path for check
     CONFIG_FILE_EXPANDED="${CONFIG_FILE/#\~/$HOME}"
-    
+
     if [ ! -f "$CONFIG_FILE_EXPANDED" ]; then
         touch "$CONFIG_FILE_EXPANDED"
     fi
