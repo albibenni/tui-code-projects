@@ -17,6 +17,7 @@ mod typescript_backend;
 mod typescript_desktop;
 mod typescript_frontend;
 pub mod writer;
+mod writer_constants;
 
 #[cfg(test)]
 pub(crate) use flutter::{launch_json_for, platforms_for};
