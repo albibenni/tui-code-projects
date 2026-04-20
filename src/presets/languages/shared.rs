@@ -1,24 +1,24 @@
 use super::types::{Choice, OptionStep};
 
 pub fn pm_js() -> OptionStep {
-    let hooks = git_hooks_ts_step();
+    let eslint = eslint_frontend_step();
     OptionStep {
         title: "Package Manager",
         choices: vec![
             Choice {
                 name: "npm",
                 description: "Default Node.js package manager",
-                follow_up: vec![hooks.clone()],
+                follow_up: vec![eslint.clone()],
             },
             Choice {
                 name: "pnpm",
                 description: "Fast, disk-efficient package manager",
-                follow_up: vec![hooks.clone()],
+                follow_up: vec![eslint.clone()],
             },
             Choice {
                 name: "bun",
                 description: "Fast JavaScript all-in-one toolkit",
-                follow_up: vec![hooks],
+                follow_up: vec![eslint],
             },
         ],
     }
@@ -70,6 +70,35 @@ pub fn eslint_backend_step() -> OptionStep {
                 name: "Custom Strict",
                 description: "Full preset: eslint.config.js + tsconfig.json + .prettierrc",
                 follow_up: vec![],
+            },
+        ],
+    }
+}
+
+pub fn eslint_frontend_step() -> OptionStep {
+    let hooks = git_hooks_ts_step();
+    OptionStep {
+        title: "ESLint",
+        choices: vec![
+            Choice {
+                name: "None",
+                description: "Skip ESLint",
+                follow_up: vec![hooks.clone()],
+            },
+            Choice {
+                name: "Recommended",
+                description: "typescript-eslint recommended, flat config (eslint.config.js)",
+                follow_up: vec![hooks.clone()],
+            },
+            Choice {
+                name: "Recommended + Prettier",
+                description: "Recommended + eslint-plugin-prettier, flat config",
+                follow_up: vec![hooks.clone()],
+            },
+            Choice {
+                name: "Custom Strict",
+                description: "Full preset: eslint.config.js + tsconfig.json + .prettierrc",
+                follow_up: vec![hooks],
             },
         ],
     }

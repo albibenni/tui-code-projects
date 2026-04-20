@@ -1,20 +1,20 @@
-use super::shared::{git_hooks_ts_step, pm_js};
+use super::shared::{eslint_frontend_step, pm_js};
 use super::types::{Category, Choice, Language, OptionStep};
 
 fn angular_pm_step() -> OptionStep {
-    let hooks = git_hooks_ts_step();
+    let eslint = eslint_frontend_step();
     OptionStep {
         title: "Package Manager",
         choices: vec![
             Choice {
                 name: "npm",
                 description: "Default Node.js package manager",
-                follow_up: vec![hooks.clone()],
+                follow_up: vec![eslint.clone()],
             },
             Choice {
                 name: "pnpm",
                 description: "Fast, disk-efficient package manager",
-                follow_up: vec![hooks],
+                follow_up: vec![eslint],
             },
         ],
     }

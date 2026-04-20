@@ -49,6 +49,36 @@ fn frontend_languages_are_correct() {
 }
 
 #[test]
+fn frontend_typescript_flow_includes_eslint_step_after_package_manager() {
+    let lang = get_languages()
+        .into_iter()
+        .find(|l| l.name == "TypeScript (Frontend)")
+        .expect("TypeScript (Frontend) should exist");
+    let framework_step = &lang.steps[0];
+    let react_choice = framework_step
+        .choices
+        .iter()
+        .find(|c| c.name == "React")
+        .expect("React framework choice should exist");
+    let variant_step = &react_choice.follow_up[0];
+    let vite_choice = variant_step
+        .choices
+        .iter()
+        .find(|c| c.name == "Vite")
+        .expect("Vite variant should exist");
+    let pm_step = &vite_choice.follow_up[0];
+
+    assert_eq!(pm_step.title, "Package Manager");
+    assert!(pm_step.choices.iter().all(|choice| {
+        choice
+            .follow_up
+            .first()
+            .map(|step| step.title == "ESLint")
+            .unwrap_or(false)
+    }));
+}
+
+#[test]
 fn mobile_languages_are_correct() {
     let langs: Vec<_> = get_languages()
         .into_iter()
