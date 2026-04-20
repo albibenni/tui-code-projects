@@ -150,6 +150,7 @@ fn scaffold_node_bun(
                 "@eslint/eslintrc",
                 "typescript-eslint",
                 "globals",
+                "prettier",
                 "eslint-plugin-prettier",
                 "eslint-config-prettier",
             ]);
@@ -195,6 +196,7 @@ fn scaffold_node_bun(
 
     send(tx, "Writing package.json...");
     writer::write_file(base, "package.json", &package_json)?;
+    writer::ensure_js_linting_scripts(base, eslint)?;
 
     send(tx, format!("Running {pm} install..."));
     let (prog, args): (&str, &[&str]) = match pm {

@@ -7,3 +7,4 @@ mod flutter_tests;
 mod languages_tests;
 mod scaffold_tests;
 mod theme_tests;
+mod writer_tests;

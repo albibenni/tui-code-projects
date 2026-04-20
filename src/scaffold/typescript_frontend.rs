@@ -22,7 +22,8 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
         _ => Ok(()),
     }?;
 
-    setup_default_eslint(base, pm, eslint, tx)
+    setup_default_eslint(base, pm, eslint, tx)?;
+    writer::ensure_js_linting_scripts(base, eslint)
 }
 
 fn scaffold_vue(
@@ -329,6 +330,7 @@ fn eslint_dev_deps(eslint: &str) -> &'static [&'static str] {
             "@eslint/eslintrc",
             "typescript-eslint",
             "globals",
+            "prettier",
             "eslint-plugin-prettier",
             "eslint-config-prettier",
         ],
