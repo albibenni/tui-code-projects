@@ -73,6 +73,25 @@ fn scaffold_react(
             )?;
             install_deps(base, pm, tx)
         }
+        Some("TanStack Start") => {
+            send(tx, "Running tanstack create...");
+            run_in(
+                base,
+                "npx",
+                &[
+                    "@tanstack/cli@latest",
+                    "create",
+                    ".",
+                    "--package-manager",
+                    pm,
+                    "--non-interactive",
+                    "--yes",
+                    "--no-git",
+                    "--force",
+                ],
+                tx,
+            )
+        }
         Some("Expo") => {
             send(tx, "Running create-expo-app...");
             run_in(

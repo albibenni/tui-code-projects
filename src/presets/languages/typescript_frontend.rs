@@ -49,6 +49,11 @@ pub fn typescript_frontend_language() -> Language {
                                 follow_up: vec![pm_js()],
                             },
                             Choice {
+                                name: "TanStack Start",
+                                description: "Full-stack React framework by TanStack",
+                                follow_up: vec![pm_js()],
+                            },
+                            Choice {
                                 name: "Expo",
                                 description: "React Native cross-platform",
                                 follow_up: vec![pm_js()],

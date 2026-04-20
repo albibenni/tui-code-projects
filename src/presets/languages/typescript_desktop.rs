@@ -1,4 +1,4 @@
-use super::shared::{git_hooks_general_step, package_manager_step};
+use super::shared::pm_js;
 use super::types::{Category, Choice, Language, OptionStep};
 
 pub fn typescript_desktop_language() -> Language {
@@ -21,8 +21,7 @@ pub fn typescript_desktop_language() -> Language {
                     },
                 ],
             },
-            package_manager_step(),
-            git_hooks_general_step(),
+            pm_js(),
         ],
     }
 }
