@@ -3,11 +3,13 @@ use std::sync::mpsc::Sender;
 
 use super::command::run_in;
 use super::params::ScaffoldParams;
+use super::writer;
 
 pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Result<(), String> {
     let framework = params.sel("Framework").unwrap_or("");
     let variant = params.sel("Variant");
     let pm = params.sel("Package Manager").unwrap_or("npm");
+    let eslint = params.sel("ESLint").unwrap_or("Recommended + Prettier");
 
     match framework {
         "React" => scaffold_react(base, variant, pm, tx),
@@ -18,7 +20,9 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
         "Qwik" => scaffold_qwik(base, pm, tx),
         "Solid" => scaffold_vite(base, "solid-ts", pm, tx),
         _ => Ok(()),
-    }
+    }?;
+
+    setup_default_eslint(base, pm, eslint, tx)
 }
 
 fn scaffold_vue(
@@ -53,7 +57,7 @@ fn scaffold_react(
                     "create-next-app@latest",
                     ".",
                     "--typescript",
-                    "--no-eslint",
+                    "--eslint",
                     "--no-tailwind",
                     "--no-src-dir",
                     "--no-app",
@@ -271,6 +275,64 @@ fn install_command(pm: &str) -> (&str, Vec<&'static str>) {
         "yarn" => ("yarn", vec!["install"]),
         "bun" => ("bun", vec!["install"]),
         _ => ("npm", vec!["install"]),
+    }
+}
+
+fn setup_default_eslint(base: &Path, pm: &str, eslint: &str, tx: &Sender<String>) -> Result<(), String> {
+    let dev_deps = eslint_dev_deps(eslint);
+    if dev_deps.is_empty() {
+        return Ok(());
+    }
+
+    send(tx, format!("Installing ESLint dev dependencies ({pm})..."));
+    let mut args: Vec<&str> = Vec::new();
+    let prog = match pm {
+        "pnpm" => {
+            args.extend_from_slice(&["add", "-D"]);
+            "pnpm"
+        }
+        "yarn" => {
+            args.extend_from_slice(&["add", "-D"]);
+            "yarn"
+        }
+        "bun" => {
+            args.extend_from_slice(&["add", "-d"]);
+            "bun"
+        }
+        _ => {
+            args.extend_from_slice(&["install", "-D"]);
+            "npm"
+        }
+    };
+    args.extend_from_slice(dev_deps);
+    run_in(base, prog, &args, tx)?;
+
+    send(tx, "Writing ESLint/Prettier config files...");
+    writer::write_eslint_config_files(base, eslint)
+}
+
+fn eslint_dev_deps(eslint: &str) -> &'static [&'static str] {
+    match eslint {
+        "Recommended" => &["eslint", "@eslint/js", "typescript-eslint", "globals"],
+        "Recommended + Prettier" => &[
+            "eslint",
+            "@eslint/js",
+            "typescript-eslint",
+            "globals",
+            "prettier",
+            "eslint-plugin-prettier",
+            "eslint-config-prettier",
+        ],
+        "Custom Strict" => &[
+            "eslint",
+            "@eslint/js",
+            "@eslint/eslintrc",
+            "typescript-eslint",
+            "globals",
+            "eslint-plugin-prettier",
+            "eslint-config-prettier",
+        ],
+        _ => &[],
     }
 }
 
