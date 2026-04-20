@@ -2,26 +2,50 @@ use std::fs;
 use std::path::Path;
 
 use super::writer_constants::{
-    ESLINT_CUSTOM_STRICT, ESLINT_RECOMMENDED, ESLINT_RECOMMENDED_PRETTIER, PRETTIERRC,
-    TSCONFIG_CUSTOM_STRICT, TSCONFIG_DEFAULT,
+    BACKEND_ESLINT_CUSTOM_STRICT, BACKEND_ESLINT_RECOMMENDED, BACKEND_ESLINT_RECOMMENDED_PRETTIER,
+    FRONTEND_ESLINT_CUSTOM_STRICT, FRONTEND_ESLINT_RECOMMENDED,
+    FRONTEND_ESLINT_RECOMMENDED_PRETTIER, PRETTIERRC, TSCONFIG_CUSTOM_STRICT, TSCONFIG_DEFAULT,
 };
 
-pub fn write_eslint_files(base: &Path, eslint_choice: &str) -> Result<(), String> {
-    write_tsconfig_for_eslint(base, eslint_choice)?;
-    write_eslint_config_files(base, eslint_choice)
+#[derive(Clone, Copy)]
+pub enum EslintTarget {
+    Frontend,
+    Backend,
 }
 
-pub fn write_eslint_config_files(base: &Path, eslint_choice: &str) -> Result<(), String> {
+pub fn write_eslint_files(base: &Path, eslint_choice: &str, target: EslintTarget) -> Result<(), String> {
+    write_tsconfig_for_eslint(base, eslint_choice)?;
+    write_eslint_config_files(base, eslint_choice, target)
+}
+
+pub fn write_eslint_config_files(
+    base: &Path,
+    eslint_choice: &str,
+    target: EslintTarget,
+) -> Result<(), String> {
+    let (recommended, recommended_prettier, custom_strict) = match target {
+        EslintTarget::Frontend => (
+            FRONTEND_ESLINT_RECOMMENDED,
+            FRONTEND_ESLINT_RECOMMENDED_PRETTIER,
+            FRONTEND_ESLINT_CUSTOM_STRICT,
+        ),
+        EslintTarget::Backend => (
+            BACKEND_ESLINT_RECOMMENDED,
+            BACKEND_ESLINT_RECOMMENDED_PRETTIER,
+            BACKEND_ESLINT_CUSTOM_STRICT,
+        ),
+    };
+
     match eslint_choice {
         "Recommended" => {
-            write_file(base, "eslint.config.js", ESLINT_RECOMMENDED)?;
+            write_file(base, "eslint.config.js", recommended)?;
         }
         "Recommended + Prettier" => {
-            write_file(base, "eslint.config.js", ESLINT_RECOMMENDED_PRETTIER)?;
+            write_file(base, "eslint.config.js", recommended_prettier)?;
             write_file(base, ".prettierrc", PRETTIERRC)?;
         }
         "Custom Strict" => {
-            write_file(base, "eslint.config.js", ESLINT_CUSTOM_STRICT)?;
+            write_file(base, "eslint.config.js", custom_strict)?;
             write_file(base, ".prettierrc", PRETTIERRC)?;
         }
         _ => {}

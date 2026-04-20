@@ -206,7 +206,7 @@ fn scaffold_node_bun(
     run_in(base, prog, args, tx)?;
 
     send(tx, "Writing config files...");
-    writer::write_eslint_files(base, eslint)?;
+    writer::write_eslint_files(base, eslint, writer::EslintTarget::Backend)?;
 
     send(tx, "Creating src/index.ts...");
     write_entry_file(base, framework)

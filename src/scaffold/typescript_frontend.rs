@@ -308,7 +308,7 @@ fn setup_default_eslint(base: &Path, pm: &str, eslint: &str, tx: &Sender<String>
     run_in(base, prog, &args, tx)?;
 
     send(tx, "Writing ESLint/Prettier config files...");
-    writer::write_eslint_config_files(base, eslint)
+    writer::write_eslint_config_files(base, eslint, writer::EslintTarget::Frontend)
 }
 
 fn eslint_dev_deps(eslint: &str) -> &'static [&'static str] {
