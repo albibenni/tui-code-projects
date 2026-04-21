@@ -142,15 +142,21 @@ fn enter_with_path_separator_in_name_sets_error() {
 
 #[test]
 fn validate_project_name_rejects_path_separator() {
-    assert!(validate_project_name("my/app").is_err());
+    assert!(validate_project_name("my/app", None).is_err());
 }
 
 #[test]
 fn validate_project_name_rejects_parent_dir() {
-    assert!(validate_project_name("..").is_err());
+    assert!(validate_project_name("..", None).is_err());
 }
 
 #[test]
 fn validate_project_name_rejects_absolute_path() {
-    assert!(validate_project_name("/tmp/app").is_err());
+    assert!(validate_project_name("/tmp/app", None).is_err());
+}
+
+#[test]
+fn validate_project_name_rejects_uppercase_for_typescript() {
+    assert!(validate_project_name("MyApp", Some("TypeScript (Frontend)")).is_err());
+    assert!(validate_project_name("myapp", Some("TypeScript (Frontend)")).is_ok());
 }

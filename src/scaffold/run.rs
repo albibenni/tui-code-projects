@@ -20,7 +20,8 @@ pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
 }
 
 fn execute(params: &ScaffoldParams, tx: &Sender<String>) -> Result<(), String> {
-    validate_project_name(&params.project_name).map_err(ToString::to_string)?;
+    validate_project_name(&params.project_name, Some(&params.language_name))
+        .map_err(ToString::to_string)?;
 
     let base: PathBuf = [&params.project_path, &params.project_name]
         .iter()

@@ -43,10 +43,11 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     .split(inner);
 
     // Name label
-    frame.render_widget(
-        Paragraph::new(Span::styled(" Project Name", theme::UNSELECTED)),
-        rows[1],
-    );
+    let mut name_spans = vec![Span::styled(" Project Name", theme::UNSELECTED)];
+    if lang_name.contains("TypeScript") {
+        name_spans.push(Span::styled(" (use lowercase)", theme::HINT));
+    }
+    frame.render_widget(Paragraph::new(Line::from(name_spans)), rows[1]);
 
     // Name input
     let name_active = app.config.active_field == ConfigField::Name;

@@ -38,12 +38,18 @@ impl ConfigState {
     }
 }
 
-pub fn validate_project_name(name: &str) -> Result<(), &'static str> {
+pub fn validate_project_name(name: &str, language: Option<&str>) -> Result<(), &'static str> {
     if name.trim().is_empty() {
         return Err("Project name cannot be empty");
     }
     if name.contains('/') || name.contains('\\') {
         return Err("Project name cannot contain path separators");
+    }
+
+    if let Some(lang) = language {
+        if lang.contains("TypeScript") && name.chars().any(|c| c.is_uppercase()) {
+            return Err("Project name must be lowercase for TypeScript projects");
+        }
     }
 
     let mut components = Path::new(name).components();
