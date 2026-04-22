@@ -24,7 +24,22 @@ pub fn draw(frame: &mut Frame, app: &App) {
 
     let mut lines = Vec::new();
     for l in &app.output_lines {
-        let clean = l.chars().filter(|c| !c.is_control() || *c == '\n').collect::<String>();
+        // Simple ANSI escape code stripper
+        let mut clean = String::new();
+        let mut chars = l.chars();
+        while let Some(c) = chars.next() {
+            if c == '\x1B' {
+                // Skip until we find the end of the ANSI sequence (a letter)
+                while let Some(next) = chars.next() {
+                    if next.is_ascii_alphabetic() {
+                        break;
+                    }
+                }
+            } else if !c.is_control() || c == '\n' {
+                clean.push(c);
+            }
+        }
+
         for part in clean.split('\n') {
             if part.len() <= inner_width {
                 lines.push(part.to_string());
