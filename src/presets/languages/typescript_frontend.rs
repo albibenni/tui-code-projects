@@ -45,28 +45,32 @@ fn pm_js_with_libs(libs: OptionStep) -> OptionStep {
 }
 
 fn eslint_frontend_step_with_libs(libs: OptionStep) -> OptionStep {
+    let hooks = super::shared::git_hooks_ts_step();
+    // Chain libs after hooks if hooks exist, or just libs
+    let follow_up = vec![hooks, libs];
+    
     OptionStep::single(
         "ESLint",
         vec![
             Choice {
                 name: "None",
                 description: "Skip ESLint",
-                follow_up: vec![libs.clone()],
+                follow_up: follow_up.clone(),
             },
             Choice {
                 name: "Recommended",
                 description: "typescript-eslint recommended, flat config (eslint.config.js)",
-                follow_up: vec![libs.clone()],
+                follow_up: follow_up.clone(),
             },
             Choice {
                 name: "Recommended + Prettier",
                 description: "Recommended + eslint-plugin-prettier, flat config",
-                follow_up: vec![libs.clone()],
+                follow_up: follow_up.clone(),
             },
             Choice {
                 name: "Custom Strict",
                 description: "Full preset: eslint.config.js + tsconfig.json + .prettierrc",
-                follow_up: vec![libs],
+                follow_up: follow_up,
             },
         ],
     )
