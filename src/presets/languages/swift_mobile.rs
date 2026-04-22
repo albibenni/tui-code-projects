@@ -6,23 +6,23 @@ pub fn swift_mobile_language() -> Language {
         name: "Swift (Mobile)",
         category: Category::Mobile,
         steps: vec![
-            OptionStep {
-                title: "Target",
-                choices: vec![Choice {
+            OptionStep::single(
+                "Target",
+                vec![Choice {
                     name: "iOS App",
                     description: "Native iPhone/iPad application",
                     follow_up: vec![ui_framework_step()],
                 }],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }
 }
 
 fn ui_framework_step() -> OptionStep {
-    OptionStep {
-        title: "UI Framework",
-        choices: vec![
+    OptionStep::single(
+        "UI Framework",
+        vec![
             Choice {
                 name: "SwiftUI",
                 description: "Modern declarative UI framework for iOS",
@@ -34,13 +34,13 @@ fn ui_framework_step() -> OptionStep {
                 follow_up: vec![deployment_target_step()],
             },
         ],
-    }
+    )
 }
 
 fn deployment_target_step() -> OptionStep {
-    OptionStep {
-        title: "iOS Deployment Target",
-        choices: vec![
+    OptionStep::single(
+        "iOS Deployment Target",
+        vec![
             Choice {
                 name: "iOS 17",
                 description: "Target recent iOS versions",
@@ -57,5 +57,5 @@ fn deployment_target_step() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }

@@ -7,6 +7,7 @@ impl App {
     pub fn handle_done(&mut self, key: KeyEvent) {
         match NavAction::from_key(key) {
             NavAction::Confirm | NavAction::Quit => self.show_quit_confirm = true,
+            NavAction::Toggle => {}
             _ => {}
         }
     }

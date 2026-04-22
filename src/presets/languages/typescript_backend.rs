@@ -4,9 +4,9 @@ use super::types::{Category, Choice, Language, OptionStep};
 fn pm_node_backend() -> OptionStep {
     let eslint = eslint_backend_step();
     let hooks = git_hooks_ts_step();
-    OptionStep {
-        title: "Package Manager",
-        choices: vec![
+    OptionStep::single(
+        "Package Manager",
+        vec![
             Choice {
                 name: "npm",
                 description: "Default Node.js package manager",
@@ -23,15 +23,15 @@ fn pm_node_backend() -> OptionStep {
                 follow_up: vec![eslint, hooks],
             },
         ],
-    }
+    )
 }
 
 fn pm_bun_backend() -> OptionStep {
     let eslint = eslint_backend_step();
     let hooks = git_hooks_ts_step();
-    OptionStep {
-        title: "Package Manager",
-        choices: vec![
+    OptionStep::single(
+        "Package Manager",
+        vec![
             Choice {
                 name: "bun",
                 description: "Bun's built-in package manager",
@@ -48,15 +48,15 @@ fn pm_bun_backend() -> OptionStep {
                 follow_up: vec![eslint, hooks],
             },
         ],
-    }
+    )
 }
 
 fn pm_deno_backend() -> OptionStep {
     let eslint = eslint_backend_step();
     let hooks = git_hooks_ts_step();
-    OptionStep {
-        title: "Package Manager",
-        choices: vec![
+    OptionStep::single(
+        "Package Manager",
+        vec![
             Choice {
                 name: "deno",
                 description: "Deno's built-in package manager",
@@ -73,22 +73,22 @@ fn pm_deno_backend() -> OptionStep {
                 follow_up: vec![eslint, hooks],
             },
         ],
-    }
+    )
 }
 
 pub fn typescript_backend_language() -> Language {
     Language {
         name: "TypeScript (Backend)",
         category: Category::Backend,
-        steps: vec![OptionStep {
-            title: "Runtime",
-            choices: vec![
+        steps: vec![OptionStep::single(
+            "Runtime",
+            vec![
                 Choice {
                     name: "Node",
                     description: "Node.js runtime",
-                    follow_up: vec![OptionStep {
-                        title: "Framework",
-                        choices: vec![
+                    follow_up: vec![OptionStep::single(
+                        "Framework",
+                        vec![
                             Choice {
                                 name: "Express",
                                 description: "Minimal and flexible web framework",
@@ -110,14 +110,14 @@ pub fn typescript_backend_language() -> Language {
                                 follow_up: vec![pm_node_backend()],
                             },
                         ],
-                    }],
+                    )],
                 },
                 Choice {
                     name: "Bun",
                     description: "Fast all-in-one JavaScript toolkit",
-                    follow_up: vec![OptionStep {
-                        title: "Framework",
-                        choices: vec![
+                    follow_up: vec![OptionStep::single(
+                        "Framework",
+                        vec![
                             Choice {
                                 name: "Hono",
                                 description: "Ultrafast web framework",
@@ -134,14 +134,14 @@ pub fn typescript_backend_language() -> Language {
                                 follow_up: vec![pm_bun_backend()],
                             },
                         ],
-                    }],
+                    )],
                 },
                 Choice {
                     name: "Deno",
                     description: "Secure runtime for JavaScript and TypeScript",
-                    follow_up: vec![OptionStep {
-                        title: "Framework",
-                        choices: vec![
+                    follow_up: vec![OptionStep::single(
+                        "Framework",
+                        vec![
                             Choice {
                                 name: "Fresh",
                                 description: "Next-gen web framework for Deno",
@@ -158,9 +158,9 @@ pub fn typescript_backend_language() -> Language {
                                 follow_up: vec![pm_deno_backend()],
                             },
                         ],
-                    }],
+                    )],
                 },
             ],
-        }],
+        )],
     }
 }

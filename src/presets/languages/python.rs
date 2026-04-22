@@ -6,9 +6,9 @@ pub fn python_language() -> Language {
         name: "Python",
         category: Category::Backend,
         steps: vec![
-            OptionStep {
-                title: "Project Type",
-                choices: vec![
+            OptionStep::single(
+                "Project Type",
+                vec![
                     Choice {
                         name: "Script",
                         description: "Simple standalone script",
@@ -22,9 +22,9 @@ pub fn python_language() -> Language {
                     Choice {
                         name: "Web API",
                         description: "HTTP server application",
-                        follow_up: vec![OptionStep {
-                            title: "Framework",
-                            choices: vec![
+                        follow_up: vec![OptionStep::single(
+                            "Framework",
+                            vec![
                                 Choice {
                                     name: "FastAPI",
                                     description: "Modern async REST API framework",
@@ -41,14 +41,14 @@ pub fn python_language() -> Language {
                                     follow_up: vec![pm_python()],
                                 },
                             ],
-                        }],
+                        )],
                     },
                     Choice {
                         name: "Data Science",
                         description: "Data analysis and ML project",
-                        follow_up: vec![OptionStep {
-                            title: "Package Manager",
-                            choices: vec![
+                        follow_up: vec![OptionStep::single(
+                            "Package Manager",
+                            vec![
                                 Choice {
                                     name: "pip",
                                     description: "Standard Python package manager",
@@ -70,10 +70,10 @@ pub fn python_language() -> Language {
                                     follow_up: vec![],
                                 },
                             ],
-                        }],
+                        )],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }

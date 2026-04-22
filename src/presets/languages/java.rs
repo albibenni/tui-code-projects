@@ -6,9 +6,9 @@ pub fn java_language() -> Language {
         name: "Java",
         category: Category::Backend,
         steps: vec![
-            OptionStep {
-                title: "Project Type",
-                choices: vec![
+            OptionStep::single(
+                "Project Type",
+                vec![
                     Choice {
                         name: "CLI",
                         description: "Command-line application",
@@ -17,9 +17,9 @@ pub fn java_language() -> Language {
                     Choice {
                         name: "Web API",
                         description: "HTTP server application",
-                        follow_up: vec![OptionStep {
-                            title: "Framework",
-                            choices: vec![
+                        follow_up: vec![OptionStep::single(
+                            "Framework",
+                            vec![
                                 Choice {
                                     name: "Spring Boot",
                                     description: "Enterprise-ready Java framework",
@@ -36,19 +36,19 @@ pub fn java_language() -> Language {
                                     follow_up: vec![build_tool_step()],
                                 },
                             ],
-                        }],
+                        )],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }
 }
 
 fn build_tool_step() -> OptionStep {
-    OptionStep {
-        title: "Build Tool",
-        choices: vec![
+    OptionStep::single(
+        "Build Tool",
+        vec![
             Choice {
                 name: "Maven",
                 description: "Standard Java build automation tool",
@@ -60,5 +60,5 @@ fn build_tool_step() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }

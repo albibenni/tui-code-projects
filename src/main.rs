@@ -10,9 +10,10 @@ mod tests;
 use std::sync::mpsc::TryRecvError;
 use std::time::Duration;
 
-use app::App;
+use app::{App, Step};
 use crossterm::event::{self, Event, KeyEventKind};
 use presets::ui;
+use scaffold::cleanup;
 use std::io;
 
 fn main() -> io::Result<()> {
@@ -44,6 +45,16 @@ fn run(terminal: &mut ratatui::DefaultTerminal) -> io::Result<()> {
         }
 
         drain_scaffold(&mut app);
+    }
+
+    scaffold::INTERRUPTED.store(true, std::sync::atomic::Ordering::SeqCst);
+
+    if app.step == Step::Running && !app.scaffold_done {
+        cleanup(&app.config.project_path, &app.config.project_name);
+        println!(
+            "\nProject creation interrupted for '{}'. Cleaned up partial files.",
+            app.config.project_name
+        );
     }
 
     Ok(())

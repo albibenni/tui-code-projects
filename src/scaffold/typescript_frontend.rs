@@ -10,6 +10,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     let variant = params.sel("Variant");
     let pm = params.sel("Package Manager").unwrap_or("npm");
     let eslint = params.sel("ESLint").unwrap_or("Recommended + Prettier");
+    let libraries = params.sel("Libraries").unwrap_or("None");
 
     match framework {
         "React" => scaffold_react(base, variant, pm, tx),
@@ -22,8 +23,82 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
         _ => Ok(()),
     }?;
 
+    if framework == "React" && libraries != "None" {
+        if let Err(e) = setup_libraries(base, pm, libraries, tx) {
+            let _ = tx.send(format!("Warning: library setup encountered an issue: {e}"));
+        }
+    }
+
     setup_default_eslint(base, pm, eslint, tx)?;
     writer::ensure_js_linting_scripts(base, eslint)
+}
+
+fn setup_libraries(
+    base: &Path,
+    pm: &str,
+    libraries: &str,
+    tx: &Sender<String>,
+) -> Result<(), String> {
+    let mut deps = Vec::new();
+    let mut dev_deps = Vec::new();
+
+    if libraries.contains("TanStack Query") {
+        deps.push("@tanstack/react-query");
+        dev_deps.push("@tanstack/eslint-plugin-query");
+    }
+
+    if libraries.contains("Tailwind CSS") {
+        dev_deps.extend_from_slice(&["tailwindcss", "postcss", "autoprefixer"]);
+    }
+
+    if libraries.contains("Lucide React") {
+        deps.push("lucide-react");
+    }
+
+    if !deps.is_empty() {
+        send(tx, format!("Installing libraries: {}...", deps.join(", ")));
+        let (prog, mut args) = add_command(pm, false);
+        args.extend_from_slice(&deps);
+        run_in(base, prog, &args, tx)?;
+    }
+
+    if !dev_deps.is_empty() {
+        send(
+            tx,
+            format!("Installing dev libraries: {}...", dev_deps.join(", ")),
+        );
+        let (prog, mut args) = add_command(pm, true);
+        args.extend_from_slice(&dev_deps);
+        run_in(base, prog, &args, tx)?;
+    }
+
+    if libraries.contains("Tailwind CSS") {
+        send(tx, "Initializing Tailwind CSS...");
+        let (prog, args) = match pm {
+            "pnpm" => ("pnpm", vec!["tailwindcss", "init", "-p"]),
+            "yarn" => ("yarn", vec!["tailwindcss", "init", "-p"]),
+            "bun" => ("bun", vec!["x", "tailwindcss", "init", "-p"]),
+            _ => ("npx", vec!["--yes", "tailwindcss", "init", "-p"]),
+        };
+        if let Err(e) = run_in(base, prog, &args, tx) {
+            let _ = tx.send(format!("Warning: failed to initialize Tailwind CSS: {e}"));
+        }
+    }
+
+    Ok(())
+}
+
+fn add_command(pm: &str, dev: bool) -> (&str, Vec<&'static str>) {
+    match (pm, dev) {
+        ("pnpm", true) => ("pnpm", vec!["add", "-D"]),
+        ("pnpm", false) => ("pnpm", vec!["add"]),
+        ("yarn", true) => ("yarn", vec!["add", "-D"]),
+        ("yarn", false) => ("yarn", vec!["add"]),
+        ("bun", true) => ("bun", vec!["add", "-d"]),
+        ("bun", false) => ("bun", vec!["add"]),
+        (_, true) => ("npm", vec!["install", "-D"]),
+        (_, false) => ("npm", vec!["install"]),
+    }
 }
 
 fn scaffold_vue(

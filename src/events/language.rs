@@ -25,6 +25,7 @@ impl App {
             NavAction::Quit => {
                 self.show_quit_confirm = true;
             }
+            NavAction::Toggle => {}
             NavAction::Other => {}
         }
     }

@@ -32,12 +32,21 @@ pub fn run_in(dir: &Path, program: &str, args: &[&str], tx: &Sender<String>) -> 
         }
     });
 
+    let status = loop {
+        if super::INTERRUPTED.load(std::sync::atomic::Ordering::SeqCst) {
+            let _ = child.kill();
+            return Err("Interrupted".to_string());
+        }
+
+        if let Some(status) = child.try_wait().map_err(|e| format!("Wait failed: {e}"))? {
+            break status;
+        }
+
+        thread::sleep(std::time::Duration::from_millis(50));
+    };
+
     t_out.join().ok();
     t_err.join().ok();
-
-    let status = child
-        .wait()
-        .map_err(|e| format!("Failed to wait for `{program}`: {e}"))?;
 
     if status.success() {
         Ok(())

@@ -7,6 +7,7 @@ use ratatui::widgets::{Block, BorderType, Paragraph};
 
 pub fn draw(frame: &mut Frame, app: &App) {
     let area = centered_rect(72, 24, frame.area());
+    let inner_width = area.width.saturating_sub(4) as usize;
     let inner_height = area.height.saturating_sub(2) as usize;
 
     let hint = if app.scaffold_done {
@@ -21,10 +22,44 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .title_top(Span::styled(" new-project — running ", theme::TITLE))
         .title_bottom(Line::from(Span::styled(hint, theme::HINT)).right_aligned());
 
-    let visible_lines: Vec<Line> = app
-        .output_lines
+    let mut lines = Vec::new();
+    for l in &app.output_lines {
+        // Simple ANSI escape code stripper
+        let mut clean = String::new();
+        let mut chars = l.chars();
+        while let Some(c) = chars.next() {
+            if c == '\x1B' {
+                // Skip until we find the end of the ANSI sequence (a letter)
+                while let Some(next) = chars.next() {
+                    if next.is_ascii_alphabetic() {
+                        break;
+                    }
+                }
+            } else if !c.is_control() || c == '\n' {
+                clean.push(c);
+            }
+        }
+
+        for part in clean.split('\n') {
+            if part.len() <= inner_width {
+                lines.push(part.to_string());
+            } else {
+                let mut current = part;
+                while current.len() > inner_width {
+                    let (left, right) = current.split_at(inner_width);
+                    lines.push(left.to_string());
+                    current = right;
+                }
+                lines.push(current.to_string());
+            }
+        }
+    }
+
+    let visible_lines: Vec<Line> = lines
         .iter()
-        .skip(app.output_lines.len().saturating_sub(inner_height))
+        .rev()
+        .take(inner_height)
+        .rev()
         .map(|l| {
             let style = if l.starts_with("Error:") {
                 theme::ERROR

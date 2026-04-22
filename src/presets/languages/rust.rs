@@ -6,9 +6,9 @@ pub fn rust_language() -> Language {
         name: "Rust",
         category: Category::Backend,
         steps: vec![
-            OptionStep {
-                title: "Project Type",
-                choices: vec![
+            OptionStep::single(
+                "Project Type",
+                vec![
                     Choice {
                         name: "Binary",
                         description: "Executable binary crate",
@@ -22,9 +22,9 @@ pub fn rust_language() -> Language {
                     Choice {
                         name: "Web API",
                         description: "HTTP server application",
-                        follow_up: vec![OptionStep {
-                            title: "Framework",
-                            choices: vec![
+                        follow_up: vec![OptionStep::single(
+                            "Framework",
+                            vec![
                                 Choice {
                                     name: "Axum",
                                     description: "Modular web framework by Tokio",
@@ -46,10 +46,10 @@ pub fn rust_language() -> Language {
                                     follow_up: vec![],
                                 },
                             ],
-                        }],
+                        )],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }

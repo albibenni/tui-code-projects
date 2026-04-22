@@ -30,6 +30,25 @@ impl Category {
 pub struct OptionStep {
     pub title: &'static str,
     pub choices: Vec<Choice>,
+    pub is_multi: bool,
+}
+
+impl OptionStep {
+    pub fn single(title: &'static str, choices: Vec<Choice>) -> Self {
+        Self {
+            title,
+            choices,
+            is_multi: false,
+        }
+    }
+
+    pub fn multi(title: &'static str, choices: Vec<Choice>) -> Self {
+        Self {
+            title,
+            choices,
+            is_multi: true,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

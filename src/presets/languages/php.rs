@@ -6,9 +6,9 @@ pub fn php_language() -> Language {
         name: "PHP",
         category: Category::Backend,
         steps: vec![
-            OptionStep {
-                title: "Project Type",
-                choices: vec![
+            OptionStep::single(
+                "Project Type",
+                vec![
                     Choice {
                         name: "CLI",
                         description: "Command-line script or tool",
@@ -17,9 +17,9 @@ pub fn php_language() -> Language {
                     Choice {
                         name: "Web API",
                         description: "HTTP server application",
-                        follow_up: vec![OptionStep {
-                            title: "Framework",
-                            choices: vec![
+                        follow_up: vec![OptionStep::single(
+                            "Framework",
+                            vec![
                                 Choice {
                                     name: "Laravel",
                                     description: "Full-featured modern PHP framework",
@@ -36,19 +36,19 @@ pub fn php_language() -> Language {
                                     follow_up: vec![deps_step()],
                                 },
                             ],
-                        }],
+                        )],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }
 }
 
 fn deps_step() -> OptionStep {
-    OptionStep {
-        title: "Dependency Manager",
-        choices: vec![
+    OptionStep::single(
+        "Dependency Manager",
+        vec![
             Choice {
                 name: "Composer",
                 description: "Standard PHP dependency manager",
@@ -60,5 +60,5 @@ fn deps_step() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }

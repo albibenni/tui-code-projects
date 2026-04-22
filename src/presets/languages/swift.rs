@@ -6,15 +6,15 @@ pub fn swift_language() -> Language {
         name: "Swift",
         category: Category::Desktop,
         steps: vec![
-            OptionStep {
-                title: "UI Framework",
-                choices: vec![
+            OptionStep::single(
+                "UI Framework",
+                vec![
                     Choice {
                         name: "SwiftUI",
                         description: "Declarative UI framework for Apple platforms",
-                        follow_up: vec![OptionStep {
-                            title: "Core Language",
-                            choices: vec![
+                        follow_up: vec![OptionStep::single(
+                            "Core Language",
+                            vec![
                                 Choice {
                                     name: "Swift Only",
                                     description: "Pure Swift application",
@@ -26,7 +26,7 @@ pub fn swift_language() -> Language {
                                     follow_up: vec![],
                                 },
                             ],
-                        }],
+                        )],
                     },
                     Choice {
                         name: "AppKit",
@@ -34,7 +34,7 @@ pub fn swift_language() -> Language {
                         follow_up: vec![],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }

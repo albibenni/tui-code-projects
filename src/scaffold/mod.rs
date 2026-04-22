@@ -1,3 +1,7 @@
+use std::sync::atomic::AtomicBool;
+
+pub static INTERRUPTED: AtomicBool = AtomicBool::new(false);
+
 mod command;
 mod flutter;
 mod go;
@@ -22,4 +26,4 @@ mod writer_constants;
 #[cfg(test)]
 pub(crate) use flutter::{launch_json_for, platforms_for};
 pub use params::ScaffoldParams;
-pub use run::run_threaded;
+pub use run::{cleanup, run_threaded};

@@ -6,9 +6,9 @@ pub fn rust_desktop_language() -> Language {
         name: "Rust (Desktop)",
         category: Category::Desktop,
         steps: vec![
-            OptionStep {
-                title: "Framework",
-                choices: vec![
+            OptionStep::single(
+                "Framework",
+                vec![
                     Choice {
                         name: "Tauri",
                         description: "Cross-platform app with web frontend and Rust backend",
@@ -20,7 +20,7 @@ pub fn rust_desktop_language() -> Language {
                         follow_up: vec![],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }

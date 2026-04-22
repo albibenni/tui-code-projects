@@ -12,12 +12,19 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     };
 
     let count = option_step.choices.len();
+    let is_multi = option_step.is_multi;
     let height = (count as u16 * 2 + 4).max(8);
     let area = centered_rect(56, height, frame.area());
 
     let category_label = app.selected_category.map(|c| c.label()).unwrap_or("");
     let lang_name = app.selected_language().map(|l| l.name).unwrap_or("");
     let step_title = option_step.title;
+
+    let hint = if is_multi {
+        " ↑↓ navigate  space toggle  enter confirm  b back  q quit "
+    } else {
+        " ↑↓ navigate  enter select  b back  q quit "
+    };
 
     let block = Block::bordered()
         .border_type(BorderType::Rounded)
@@ -30,19 +37,26 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             theme::TITLE,
         ))
         .title_bottom(
-            Line::from(Span::styled(
-                " ↑↓ navigate  enter select  b back  q quit ",
-                theme::HINT,
-            ))
-            .right_aligned(),
+            Line::from(Span::styled(hint, theme::HINT)).right_aligned(),
         );
 
     let items: Vec<ListItem> = option_step
         .choices
         .iter()
-        .map(|c| {
+        .enumerate()
+        .map(|(i, c)| {
+            let prefix = if is_multi {
+                if app.current_multi_indices.contains(&i) {
+                    "[x] "
+                } else {
+                    "[ ] "
+                }
+            } else {
+                ""
+            };
+
             ListItem::new(Text::from(vec![
-                Line::from(Span::raw(format!(" {} ", c.name))),
+                Line::from(Span::raw(format!(" {}{} ", prefix, c.name))),
                 Line::from(Span::styled(
                     format!("   {} ", c.description),
                     theme::UNSELECTED,

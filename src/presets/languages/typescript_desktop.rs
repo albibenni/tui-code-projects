@@ -6,9 +6,9 @@ pub fn typescript_desktop_language() -> Language {
         name: "TypeScript (Desktop)",
         category: Category::Desktop,
         steps: vec![
-            OptionStep {
-                title: "Framework",
-                choices: vec![
+            OptionStep::single(
+                "Framework",
+                vec![
                     Choice {
                         name: "Electron",
                         description: "Build cross-platform desktop apps with Web Technologies",
@@ -20,7 +20,7 @@ pub fn typescript_desktop_language() -> Language {
                         follow_up: vec![],
                     },
                 ],
-            },
+            ),
             pm_js(),
         ],
     }

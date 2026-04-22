@@ -6,9 +6,9 @@ pub fn go_desktop_language() -> Language {
         name: "Go (Desktop)",
         category: Category::Desktop,
         steps: vec![
-            OptionStep {
-                title: "Framework",
-                choices: vec![
+            OptionStep::single(
+                "Framework",
+                vec![
                     Choice {
                         name: "Fyne",
                         description: "Cross-platform GUI toolkit written in Go",
@@ -20,7 +20,7 @@ pub fn go_desktop_language() -> Language {
                         follow_up: vec![],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }

@@ -6,9 +6,9 @@ pub fn kotlin_mobile_language() -> Language {
         name: "Kotlin (Mobile)",
         category: Category::Mobile,
         steps: vec![
-            OptionStep {
-                title: "UI Toolkit",
-                choices: vec![
+            OptionStep::single(
+                "UI Toolkit",
+                vec![
                     Choice {
                         name: "Jetpack Compose",
                         description: "Modern declarative Android UI toolkit",
@@ -20,16 +20,16 @@ pub fn kotlin_mobile_language() -> Language {
                         follow_up: vec![build_tool_step()],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }
 }
 
 fn build_tool_step() -> OptionStep {
-    OptionStep {
-        title: "Build Tool",
-        choices: vec![
+    OptionStep::single(
+        "Build Tool",
+        vec![
             Choice {
                 name: "Gradle (KTS)",
                 description: "Gradle with Kotlin DSL scripts",
@@ -41,5 +41,5 @@ fn build_tool_step() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }
