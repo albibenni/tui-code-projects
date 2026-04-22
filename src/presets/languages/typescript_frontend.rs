@@ -47,7 +47,7 @@ fn pm_js_with_libs(libs: OptionStep) -> OptionStep {
 fn eslint_frontend_step_with_libs(libs: OptionStep) -> OptionStep {
     let hooks = super::shared::git_hooks_ts_step();
     // Chain libs after hooks if hooks exist, or just libs
-    let follow_up = vec![hooks, libs];
+    let follow_up = vec![libs, hooks];
     
     OptionStep::single(
         "ESLint",
@@ -70,31 +70,30 @@ fn eslint_frontend_step_with_libs(libs: OptionStep) -> OptionStep {
             Choice {
                 name: "Custom Strict",
                 description: "Full preset: eslint.config.js + tsconfig.json + .prettierrc",
-                follow_up: follow_up,
+                follow_up,
             },
         ],
     )
 }
 
 pub fn react_libraries_step() -> OptionStep {
-    let hooks = super::shared::git_hooks_ts_step();
     OptionStep::multi(
         "Libraries",
         vec![
             Choice {
                 name: "TanStack Query",
                 description: "Powerful asynchronous state management",
-                follow_up: vec![hooks.clone()],
+                follow_up: vec![],
             },
             Choice {
                 name: "Tailwind CSS",
                 description: "Utility-first CSS framework",
-                follow_up: vec![hooks.clone()],
+                follow_up: vec![],
             },
             Choice {
                 name: "Lucide React",
                 description: "Beautifully simple pixel-perfect icons",
-                follow_up: vec![hooks],
+                follow_up: vec![],
             },
         ],
     )

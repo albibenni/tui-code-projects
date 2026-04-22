@@ -3,7 +3,7 @@ use crate::app::App;
 use crate::style::theme;
 use ratatui::Frame;
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, BorderType, Paragraph, Wrap};
+use ratatui::widgets::{Block, BorderType, Paragraph};
 
 pub fn draw(frame: &mut Frame, app: &App) {
     let area = centered_rect(72, 24, frame.area());

@@ -2,6 +2,7 @@ use crossterm::event::KeyEvent;
 
 use crate::app::{App, OptionSelection, Step};
 use crate::events::{Direction, NavAction, move_list_selection};
+use crate::presets::OptionStep;
 
 impl App {
     pub fn handle_options(&mut self, key: KeyEvent) {
@@ -44,7 +45,10 @@ impl App {
                         if let Some(choice) = step.choices.get(idx) {
                             names.push(choice.name);
                             for f in &choice.follow_up {
-                                follow_ups.push(f.clone());
+                                // Only add follow-up if it's not already in the follow-up list
+                                if !follow_ups.iter().any(|existing: &OptionStep| existing.title == f.title) {
+                                    follow_ups.push(f.clone());
+                                }
                             }
                         }
                     }
@@ -64,7 +68,10 @@ impl App {
                     });
 
                     for f in follow_ups {
-                        self.option_steps.push(f);
+                        // Also check if the step is already in self.option_steps after current index
+                        if !self.option_steps[self.option_step_index + 1..].iter().any(|s| s.title == f.title) {
+                            self.option_steps.push(f);
+                        }
                     }
 
                     self.current_multi_indices.clear();
