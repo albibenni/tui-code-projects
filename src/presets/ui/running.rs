@@ -7,6 +7,7 @@ use ratatui::widgets::{Block, BorderType, Paragraph, Wrap};
 
 pub fn draw(frame: &mut Frame, app: &App) {
     let area = centered_rect(72, 24, frame.area());
+    let inner_width = area.width.saturating_sub(4) as usize;
     let inner_height = area.height.saturating_sub(2) as usize;
 
     let hint = if app.scaffold_done {
@@ -21,24 +22,40 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .title_top(Span::styled(" new-project — running ", theme::TITLE))
         .title_bottom(Line::from(Span::styled(hint, theme::HINT)).right_aligned());
 
-    let visible_lines: Vec<Line> = app
-        .output_lines
+    let mut lines = Vec::new();
+    for l in &app.output_lines {
+        let clean = l.chars().filter(|c| !c.is_control() || *c == '\n').collect::<String>();
+        for part in clean.split('\n') {
+            if part.len() <= inner_width {
+                lines.push(part.to_string());
+            } else {
+                let mut current = part;
+                while current.len() > inner_width {
+                    let (left, right) = current.split_at(inner_width);
+                    lines.push(left.to_string());
+                    current = right;
+                }
+                lines.push(current.to_string());
+            }
+        }
+    }
+
+    let visible_lines: Vec<Line> = lines
         .iter()
-        .skip(app.output_lines.len().saturating_sub(inner_height))
+        .rev()
+        .take(inner_height)
+        .rev()
         .map(|l| {
-            // Strip \r and control characters that might mess up TUI rendering
-            let clean_line: String = l.chars().filter(|c| *c != '\r').collect();
-            
-            let style = if clean_line.starts_with("Error:") {
+            let style = if l.starts_with("Error:") {
                 theme::ERROR
-            } else if clean_line.starts_with("Done") {
+            } else if l.starts_with("Done") {
                 theme::SELECTED
             } else {
                 theme::HINT
             };
-            Line::from(Span::styled(format!(" {clean_line}"), style))
+            Line::from(Span::styled(format!(" {l}"), style))
         })
         .collect();
 
-    frame.render_widget(Paragraph::new(visible_lines).block(block).wrap(Wrap { trim: false }), area);
+    frame.render_widget(Paragraph::new(visible_lines).block(block), area);
 }
