@@ -14,4 +14,7 @@ setup:
 - [ ] Add a section on how to add new languages
 - [ ] makefile for common tasks like linting, testing, building, etc. for those who use makefiles
 - [ ] tests in typescript
-- [ ] add react tanstack
+- [x] add react tanstack
+- [ ] java - add gradle
+- [ ] tell when cleanup is done
+- [ ] last step if esc blank screen, with a second press go back (should go back with the first)
