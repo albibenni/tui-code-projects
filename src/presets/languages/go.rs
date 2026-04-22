@@ -6,9 +6,9 @@ pub fn go_language() -> Language {
         name: "Go",
         category: Category::Backend,
         steps: vec![
-            OptionStep {
-                title: "Project Type",
-                choices: vec![
+            OptionStep::single(
+                "Project Type",
+                vec![
                     Choice {
                         name: "CLI",
                         description: "Command-line application",
@@ -22,9 +22,9 @@ pub fn go_language() -> Language {
                     Choice {
                         name: "Web API",
                         description: "HTTP server application",
-                        follow_up: vec![OptionStep {
-                            title: "Framework",
-                            choices: vec![
+                        follow_up: vec![OptionStep::single(
+                            "Framework",
+                            vec![
                                 Choice {
                                     name: "Gin",
                                     description: "Fast HTTP web framework",
@@ -51,10 +51,10 @@ pub fn go_language() -> Language {
                                     follow_up: vec![],
                                 },
                             ],
-                        }],
+                        )],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }

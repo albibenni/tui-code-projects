@@ -8,6 +8,7 @@ impl App {
         match NavAction::from_key(key) {
             NavAction::Confirm if self.scaffold_done => self.step = Step::Done,
             NavAction::Quit => self.show_quit_confirm = true,
+            NavAction::Toggle => {}
             _ => {}
         }
     }

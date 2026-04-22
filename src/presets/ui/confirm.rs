@@ -26,7 +26,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
         for sel in &app.option_selections {
             lines.push(Line::from(vec![
                 Span::styled(format!("  {:<16}", sel.title), theme::HINT),
-                Span::styled(sel.choice_name, theme::SELECTED),
+                Span::styled(sel.choice_name.as_str(), theme::SELECTED),
             ]));
         }
     }

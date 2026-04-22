@@ -6,9 +6,9 @@ pub fn flutter_language() -> Language {
         name: "Flutter",
         category: Category::Mobile,
         steps: vec![
-            OptionStep {
-                title: "Start Configuration",
-                choices: vec![
+            OptionStep::single(
+                "Start Configuration",
+                vec![
                     Choice {
                         name: "Mobile (Android + iOS)",
                         description: "Optimized starter setup for phone apps",
@@ -30,10 +30,10 @@ pub fn flutter_language() -> Language {
                         follow_up: vec![],
                     },
                 ],
-            },
-            OptionStep {
-                title: "State Management",
-                choices: vec![
+            ),
+            OptionStep::single(
+                "State Management",
+                vec![
                     Choice {
                         name: "Provider",
                         description: "Simple and lightweight for most apps",
@@ -55,7 +55,7 @@ pub fn flutter_language() -> Language {
                         follow_up: vec![],
                     },
                 ],
-            },
+            ),
             git_hooks_general_step(),
         ],
     }

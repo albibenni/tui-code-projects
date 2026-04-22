@@ -18,9 +18,10 @@ pub enum Step {
 
 pub struct OptionSelection {
     pub title: &'static str,
-    pub choice_name: &'static str,
-    pub choice_index: usize,
+    pub choice_name: String, // Comma separated if multi
+    pub choice_indices: Vec<usize>,
     pub follow_up_count: usize,
+    pub is_multi: bool,
 }
 
 pub struct App {
@@ -37,6 +38,7 @@ pub struct App {
     pub option_steps: Vec<OptionStep>,
     pub option_step_index: usize,
     pub option_selections: Vec<OptionSelection>,
+    pub current_multi_indices: Vec<usize>,
     pub option_list_state: ListState,
     // Config step
     pub config: ConfigState,
@@ -67,6 +69,7 @@ impl App {
             option_steps: Vec::new(),
             option_step_index: 0,
             option_selections: Vec::new(),
+            current_multi_indices: Vec::new(),
             option_list_state,
             config: ConfigState::new(),
             scaffold_rx: None,

@@ -2,9 +2,9 @@ use super::types::{Choice, OptionStep};
 
 pub fn pm_js() -> OptionStep {
     let eslint = eslint_frontend_step();
-    OptionStep {
-        title: "Package Manager",
-        choices: vec![
+    OptionStep::single(
+        "Package Manager",
+        vec![
             Choice {
                 name: "npm",
                 description: "Default Node.js package manager",
@@ -21,13 +21,13 @@ pub fn pm_js() -> OptionStep {
                 follow_up: vec![eslint],
             },
         ],
-    }
+    )
 }
 
 pub fn pm_python() -> OptionStep {
-    OptionStep {
-        title: "Package Manager",
-        choices: vec![
+    OptionStep::single(
+        "Package Manager",
+        vec![
             Choice {
                 name: "pip",
                 description: "Standard Python package manager",
@@ -44,13 +44,13 @@ pub fn pm_python() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }
 
 pub fn eslint_backend_step() -> OptionStep {
-    OptionStep {
-        title: "ESLint",
-        choices: vec![
+    OptionStep::single(
+        "ESLint",
+        vec![
             Choice {
                 name: "None",
                 description: "Skip ESLint",
@@ -72,14 +72,14 @@ pub fn eslint_backend_step() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }
 
 pub fn eslint_frontend_step() -> OptionStep {
     let hooks = git_hooks_ts_step();
-    OptionStep {
-        title: "ESLint",
-        choices: vec![
+    OptionStep::single(
+        "ESLint",
+        vec![
             Choice {
                 name: "None",
                 description: "Skip ESLint",
@@ -101,13 +101,13 @@ pub fn eslint_frontend_step() -> OptionStep {
                 follow_up: vec![hooks],
             },
         ],
-    }
+    )
 }
 
 pub fn git_hooks_ts_step() -> OptionStep {
-    OptionStep {
-        title: "Git Hooks",
-        choices: vec![
+    OptionStep::single(
+        "Git Hooks",
+        vec![
             Choice {
                 name: "None",
                 description: "Do not configure pre-commit hooks",
@@ -119,13 +119,13 @@ pub fn git_hooks_ts_step() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }
 
 pub fn git_hooks_general_step() -> OptionStep {
-    OptionStep {
-        title: "Git Hooks",
-        choices: vec![
+    OptionStep::single(
+        "Git Hooks",
+        vec![
             Choice {
                 name: "None",
                 description: "Do not configure pre-commit hooks",
@@ -142,5 +142,5 @@ pub fn git_hooks_general_step() -> OptionStep {
                 follow_up: vec![],
             },
         ],
-    }
+    )
 }
