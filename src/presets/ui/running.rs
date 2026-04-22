@@ -3,7 +3,7 @@ use crate::app::App;
 use crate::style::theme;
 use ratatui::Frame;
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, BorderType, Paragraph};
+use ratatui::widgets::{Block, BorderType, Paragraph, Wrap};
 
 pub fn draw(frame: &mut Frame, app: &App) {
     let area = centered_rect(72, 24, frame.area());
@@ -26,16 +26,19 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .iter()
         .skip(app.output_lines.len().saturating_sub(inner_height))
         .map(|l| {
-            let style = if l.starts_with("Error:") {
+            // Strip \r and control characters that might mess up TUI rendering
+            let clean_line: String = l.chars().filter(|c| *c != '\r').collect();
+            
+            let style = if clean_line.starts_with("Error:") {
                 theme::ERROR
-            } else if l.starts_with("Done") {
+            } else if clean_line.starts_with("Done") {
                 theme::SELECTED
             } else {
                 theme::HINT
             };
-            Line::from(Span::styled(format!(" {l}"), style))
+            Line::from(Span::styled(format!(" {clean_line}"), style))
         })
         .collect();
 
-    frame.render_widget(Paragraph::new(visible_lines).block(block), area);
+    frame.render_widget(Paragraph::new(visible_lines).block(block).wrap(Wrap { trim: false }), area);
 }

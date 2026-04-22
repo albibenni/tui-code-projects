@@ -47,8 +47,6 @@ fn setup_libraries(
 
     if libraries.contains("Tailwind CSS") {
         dev_deps.extend_from_slice(&["tailwindcss", "postcss", "autoprefixer"]);
-        send(tx, "Initializing Tailwind CSS...");
-        run_in(base, "npx", &["tailwindcss", "init", "-p"], tx)?;
     }
 
     if libraries.contains("Lucide React") {
@@ -70,6 +68,12 @@ fn setup_libraries(
         let (prog, mut args) = add_command(pm, true);
         args.extend_from_slice(&dev_deps);
         run_in(base, prog, &args, tx)?;
+    }
+
+    if libraries.contains("Tailwind CSS") {
+        send(tx, "Initializing Tailwind CSS...");
+        // Use npx --yes to avoid interactive prompt, and it will pick up the locally installed version
+        run_in(base, "npx", &["--yes", "tailwindcss", "init", "-p"], tx)?;
     }
 
     Ok(())
