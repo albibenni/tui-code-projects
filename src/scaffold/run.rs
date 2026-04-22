@@ -12,6 +12,8 @@ use super::{
     swift_desktop, swift_mobile, typescript_backend, typescript_desktop, typescript_frontend,
 };
 
+use std::sync::atomic::Ordering;
+
 pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
     if let Err(e) = validate_project_name(&params.project_name, Some(&params.language_name)) {
         let _ = tx.send(format!("Error: {e}"));
@@ -22,16 +24,10 @@ pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
         .iter()
         .collect();
 
-    // Safety check: Never ever delete the current directory or its parent
-    let is_dangerous = base.as_os_str().is_empty() 
-        || base == Path::new(".") 
-        || base == Path::new("..")
-        || (base.is_relative() && (base.starts_with(".") || base.starts_with("..")) && base.components().count() < 2);
-
     if let Err(e) = execute(&params, &base, &tx) {
         let _ = tx.send(format!("Error: {e}"));
         
-        if !is_dangerous && base.exists() && base.is_dir() {
+        if !is_dangerous(&base) && base.exists() && base.is_dir() {
             let _ = tx.send("Cleaning up...".to_string());
             if let Err(cleanup_err) = fs::remove_dir_all(&base) {
                 let _ = tx.send(format!("Warning: cleanup failed: {cleanup_err}"));
@@ -40,7 +36,30 @@ pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
     }
 }
 
+pub fn cleanup(project_path: &str, project_name: &str) {
+    let base: PathBuf = [project_path, project_name].iter().collect();
+
+    if !is_dangerous(&base) && base.exists() && base.is_dir() {
+        if let Err(e) = fs::remove_dir_all(&base) {
+            eprintln!("\nWarning: cleanup failed for {}: {}", base.display(), e);
+        }
+    }
+}
+
+fn is_dangerous(path: &Path) -> bool {
+    path.as_os_str().is_empty()
+        || path == Path::new(".")
+        || path == Path::new("..")
+        || (path.is_relative()
+            && (path.starts_with(".") || path.starts_with(".."))
+            && path.components().count() < 2)
+}
+
 fn execute(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+    if super::INTERRUPTED.load(Ordering::SeqCst) {
+        return Err("Interrupted".to_string());
+    }
+
     fs::create_dir_all(base).map_err(|e| format!("Failed to create directory: {e}"))?;
 
     match params.language_name.as_str() {
@@ -60,6 +79,10 @@ fn execute(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Resu
         "Swift" => swift_desktop::scaffold(params, &base, tx)?,
         "Python" => python::scaffold(params, &base, tx)?,
         _ => {}
+    }
+
+    if super::INTERRUPTED.load(Ordering::SeqCst) {
+        return Err("Interrupted".to_string());
     }
 
     ensure_git_repo(&base, tx);
