@@ -13,23 +13,34 @@ use super::{
 };
 
 pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
+    if let Err(e) = validate_project_name(&params.project_name, Some(&params.language_name)) {
+        let _ = tx.send(format!("Error: {e}"));
+        return;
+    }
+
     let base: PathBuf = [&params.project_path, &params.project_name]
         .iter()
         .collect();
 
+    // Safety check: Never ever delete the current directory or its parent
+    let is_dangerous = base.as_os_str().is_empty() 
+        || base == Path::new(".") 
+        || base == Path::new("..")
+        || (base.is_relative() && (base.starts_with(".") || base.starts_with("..")) && base.components().count() < 2);
+
     if let Err(e) = execute(&params, &base, &tx) {
         let _ = tx.send(format!("Error: {e}"));
-        let _ = tx.send("Cleaning up...".to_string());
-        if let Err(cleanup_err) = fs::remove_dir_all(&base) {
-            let _ = tx.send(format!("Warning: cleanup failed: {cleanup_err}"));
+        
+        if !is_dangerous && base.exists() && base.is_dir() {
+            let _ = tx.send("Cleaning up...".to_string());
+            if let Err(cleanup_err) = fs::remove_dir_all(&base) {
+                let _ = tx.send(format!("Warning: cleanup failed: {cleanup_err}"));
+            }
         }
     }
 }
 
 fn execute(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
-    validate_project_name(&params.project_name, Some(&params.language_name))
-        .map_err(ToString::to_string)?;
-
     fs::create_dir_all(base).map_err(|e| format!("Failed to create directory: {e}"))?;
 
     match params.language_name.as_str() {
