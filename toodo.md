@@ -15,7 +15,4 @@ setup:
 - [ ] makefile for common tasks like linting, testing, building, etc. for those who use makefiles
 - [ ] tests in typescript
 - [ ] java - add gradle
-- [ ] tell when cleanup is done
-- [ ] last step if esc blank screen, with a second press go back (should go back with the first)
-- [ ] cleanup if I quit
-- [ ] lint require 2 enter to accept
+- [ ] cleanup if I quit - it goes in background
