@@ -13,21 +13,24 @@ use super::{
 };
 
 pub fn run_threaded(params: ScaffoldParams, tx: Sender<String>) {
-    if let Err(e) = execute(&params, &tx) {
-        let _ = tx.send(format!("Error: {e}"));
-    }
-    // tx dropped here — signals completion to the main thread
-}
-
-fn execute(params: &ScaffoldParams, tx: &Sender<String>) -> Result<(), String> {
-    validate_project_name(&params.project_name, Some(&params.language_name))
-        .map_err(ToString::to_string)?;
-
     let base: PathBuf = [&params.project_path, &params.project_name]
         .iter()
         .collect();
 
-    fs::create_dir_all(&base).map_err(|e| format!("Failed to create directory: {e}"))?;
+    if let Err(e) = execute(&params, &base, &tx) {
+        let _ = tx.send(format!("Error: {e}"));
+        let _ = tx.send("Cleaning up...".to_string());
+        if let Err(cleanup_err) = fs::remove_dir_all(&base) {
+            let _ = tx.send(format!("Warning: cleanup failed: {cleanup_err}"));
+        }
+    }
+}
+
+fn execute(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Result<(), String> {
+    validate_project_name(&params.project_name, Some(&params.language_name))
+        .map_err(ToString::to_string)?;
+
+    fs::create_dir_all(base).map_err(|e| format!("Failed to create directory: {e}"))?;
 
     match params.language_name.as_str() {
         "TypeScript (Backend)" => typescript_backend::scaffold(params, &base, tx)?,
