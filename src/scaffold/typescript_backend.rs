@@ -24,27 +24,32 @@ fn scaffold_deno(
     framework: &str,
     tx: &Sender<String>,
 ) -> Result<(), String> {
-    let imports = match framework {
-        "Oak" => "\n    \"oak\": \"jsr:@oak/oak\"",
-        "Fresh" => "\n    \"$fresh/\": \"jsr:@fresh/fresh/\"",
-        "Hono" => "\n    \"hono\": \"jsr:@hono/hono\"",
-        _ => "",
+    let mut imports = serde_json::Map::new();
+    match framework {
+        "Oak" => {
+            imports.insert("oak".to_string(), serde_json::json!("jsr:@oak/oak"));
+        }
+        "Fresh" => {
+            imports.insert("$fresh/".to_string(), serde_json::json!("jsr:@fresh/fresh/"));
+        }
+        "Hono" => {
+            imports.insert("hono".to_string(), serde_json::json!("jsr:@hono/hono"));
+        }
+        _ => {}
     };
 
-    let deno_json = format!(
-        r#"{{
-  "name": "{}",
-  "version": "0.1.0",
-  "tasks": {{
-    "dev": "deno run --watch src/main.ts",
-    "start": "deno run src/main.ts"
-  }},
-  "imports": {{{imports}
-  }}
-}}
-"#,
-        params.project_name
-    );
+    let deno_json_val = serde_json::json!({
+        "name": params.project_name,
+        "version": "0.1.0",
+        "tasks": {
+            "dev": "deno run --watch src/main.ts",
+            "start": "deno run src/main.ts"
+        },
+        "imports": imports
+    });
+
+    let deno_json = serde_json::to_string_pretty(&deno_json_val)
+        .map_err(|e| format!("Failed to serialize deno.json: {e}"))?;
 
     send(tx, "Writing deno.json...");
     writer::write_file(base, "deno.json", &deno_json)?;
@@ -158,44 +163,37 @@ fn scaffold_node_bun(
         _ => {}
     }
 
-    let deps_lines: String = deps
-        .iter()
-        .map(|d| format!("    \"{d}\": \"latest\""))
-        .collect::<Vec<_>>()
-        .join(",\n");
+    let mut pkg = serde_json::json!({
+        "name": name,
+        "version": "0.1.0",
+        "type": "module",
+        "scripts": {
+            "dev": "tsx watch src/index.ts",
+            "build": "tsc",
+            "start": "node dist/index.js"
+        },
+        "dependencies": {},
+        "devDependencies": {}
+    });
 
-    let dev_lines: String = dev_deps
-        .iter()
-        .map(|d| format!("    \"{d}\": \"latest\""))
-        .collect::<Vec<_>>()
-        .join(",\n");
+    if let Some(deps_obj) = pkg.get_mut("dependencies").and_then(|d| d.as_object_mut()) {
+        for d in deps {
+            deps_obj.insert(d.to_string(), serde_json::Value::String("latest".to_string()));
+        }
+    }
 
-    let deps_block = if deps.is_empty() {
-        "  \"dependencies\": {},".to_string()
-    } else {
-        format!("  \"dependencies\": {{\n{deps_lines}\n  }},")
-    };
+    if let Some(dev_deps_obj) = pkg.get_mut("devDependencies").and_then(|d| d.as_object_mut()) {
+        for d in dev_deps {
+            dev_deps_obj.insert(d.to_string(), serde_json::Value::String("latest".to_string()));
+        }
+    }
 
-    let package_json = format!(
-        r#"{{
-  "name": "{name}",
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {{
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
-  }},
-{deps_block}
-  "devDependencies": {{
-{dev_lines}
-  }}
-}}
-"#
-    );
+    let package_json = serde_json::to_string_pretty(&pkg)
+        .map_err(|e| format!("Failed to serialize package.json: {e}"))?;
 
     send(tx, "Writing package.json...");
     writer::write_file(base, "package.json", &package_json)?;
+
     writer::ensure_js_linting_scripts(base, eslint)?;
 
     send(tx, format!("Running {pm} install..."));
