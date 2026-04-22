@@ -63,6 +63,11 @@ fn ensure_git_repo(base: &PathBuf, tx: &Sender<String>) {
         return;
     }
 
+    if !super::command::command_exists("git") {
+        let _ = tx.send("Warning: `git` command not found. Skipping git initialization.".to_string());
+        return;
+    }
+
     let _ = tx.send("Initializing git repository...".to_string());
 
     match Command::new("git")

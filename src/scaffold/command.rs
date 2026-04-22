@@ -49,3 +49,13 @@ pub fn run_in(dir: &Path, program: &str, args: &[&str], tx: &Sender<String>) -> 
         ))
     }
 }
+
+pub fn command_exists(cmd: &str) -> bool {
+    Command::new("which")
+        .arg(cmd)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+}
