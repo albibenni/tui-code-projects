@@ -24,7 +24,9 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     }?;
 
     if framework == "React" && libraries != "None" {
-        setup_libraries(base, pm, libraries, tx)?;
+        if let Err(e) = setup_libraries(base, pm, libraries, tx) {
+            let _ = tx.send(format!("Warning: library setup encountered an issue: {e}"));
+        }
     }
 
     setup_default_eslint(base, pm, eslint, tx)?;
@@ -72,8 +74,15 @@ fn setup_libraries(
 
     if libraries.contains("Tailwind CSS") {
         send(tx, "Initializing Tailwind CSS...");
-        // Use npx --yes to avoid interactive prompt, and it will pick up the locally installed version
-        run_in(base, "npx", &["--yes", "tailwindcss", "init", "-p"], tx)?;
+        let (prog, args) = match pm {
+            "pnpm" => ("pnpm", vec!["tailwindcss", "init", "-p"]),
+            "yarn" => ("yarn", vec!["tailwindcss", "init", "-p"]),
+            "bun" => ("bun", vec!["x", "tailwindcss", "init", "-p"]),
+            _ => ("npx", vec!["--yes", "tailwindcss", "init", "-p"]),
+        };
+        if let Err(e) = run_in(base, prog, &args, tx) {
+            let _ = tx.send(format!("Warning: failed to initialize Tailwind CSS: {e}"));
+        }
     }
 
     Ok(())
