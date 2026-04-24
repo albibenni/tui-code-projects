@@ -16,3 +16,4 @@ setup:
 - [ ] tests in typescript
 - [ ] java - add gradle
 - [ ] cleanup if I quit - it goes in background
+- [ ] create gitignore
