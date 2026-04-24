@@ -1,4 +1,6 @@
-.PHONY: all build test coverage clean run check help install
+.PHONY: all build test coverage clean run check help install install-unix install-windows
+
+WIN_INSTALL_CMD = powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 
 all: build
 
@@ -18,7 +20,17 @@ test:
 	cargo test
 
 install:
+ifeq ($(OS),Windows_NT)
+	$(MAKE) install-windows
+else
+	$(MAKE) install-unix
+endif
+
+install-unix:
 	./scripts/install.sh
+
+install-windows:
+	$(WIN_INSTALL_CMD)
 
 coverage:
 	@command -v cargo-llvm-cov >/dev/null 2>&1 || (echo "cargo-llvm-cov is required. Install with: cargo install cargo-llvm-cov"; exit 1)
@@ -41,5 +53,7 @@ help:
 	@echo "  test      Run all tests"
 	@echo "  coverage  Print per-file and total coverage (lines/regions/functions) to stdout"
 	@echo "  clean     Remove build artifacts"
-	@echo "  install   Install the binary and setup an alias"
+	@echo "  install   Install the binary and setup an alias (auto OS)"
+	@echo "  install-unix     Run Bash installer script"
+	@echo "  install-windows  Run PowerShell installer script"
 	@echo "  help      Show this message"
