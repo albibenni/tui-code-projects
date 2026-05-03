@@ -91,7 +91,7 @@ fn execute(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Resu
     Ok(())
 }
 
-pub(crate) fn ensure_git_repo(base: &Path, tx: &Sender<String>) {
+pub fn ensure_git_repo(base: &Path, tx: &Sender<String>) {
     if base.join(".git").exists() {
         return;
     }
