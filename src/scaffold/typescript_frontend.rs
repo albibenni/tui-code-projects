@@ -11,6 +11,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     let pm = params.sel("Package Manager").unwrap_or("npm");
     let eslint = params.sel("ESLint").unwrap_or("Recommended + Prettier");
     let libraries = params.sel("Libraries").unwrap_or("None");
+    let testing = params.sel("Testing").unwrap_or("None");
 
     match framework {
         "React" => scaffold_react(base, variant, pm, tx),
@@ -30,6 +31,7 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     }
 
     setup_default_eslint(base, pm, eslint, tx)?;
+    setup_testing(base, pm, testing, tx)?;
     writer::ensure_js_linting_scripts(base, eslint)
 }
 
@@ -411,6 +413,49 @@ fn eslint_dev_deps(eslint: &str) -> &'static [&'static str] {
         ],
         _ => &[],
     }
+}
+
+fn setup_testing(base: &Path, pm: &str, testing: &str, tx: &Sender<String>) -> Result<(), String> {
+    if testing != "Vitest" {
+        return Ok(());
+    }
+
+    send(tx, format!("Installing Vitest dependencies ({pm})..."));
+    let mut args: Vec<&str> = Vec::new();
+    let prog = match pm {
+        "pnpm" => {
+            args.extend_from_slice(&["add", "-D"]);
+            "pnpm"
+        }
+        "yarn" => {
+            args.extend_from_slice(&["add", "-D"]);
+            "yarn"
+        }
+        "bun" => {
+            args.extend_from_slice(&["add", "-d"]);
+            "bun"
+        }
+        _ => {
+            args.extend_from_slice(&["install", "-D"]);
+            "npm"
+        }
+    };
+    args.extend_from_slice(&["vitest", "@vitest/coverage-v8", "happy-dom"]);
+    run_in(base, prog, &args, tx)?;
+
+    send(tx, "Writing Vitest config...");
+    use super::writer_constants;
+    writer::write_file(base, "vitest.config.ts", writer_constants::VITEST_FRONTEND_CONFIG)?;
+
+    // Update package.json scripts
+    let scripts = &[
+        ("test", "vitest run"),
+        ("test:watch", "vitest"),
+        ("test:coverage", "vitest run --coverage"),
+    ];
+    writer::ensure_package_json_scripts(base, scripts)?;
+    
+    Ok(())
 }
 
 fn send(tx: &Sender<String>, msg: impl Into<String>) {

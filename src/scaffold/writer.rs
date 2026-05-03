@@ -115,7 +115,7 @@ pub fn write_file(base: &Path, name: &str, content: &str) -> Result<(), String> 
     fs::write(base.join(name), content).map_err(|e| format!("Failed to write {name}: {e}"))
 }
 
-fn ensure_package_json_scripts(base: &Path, scripts: &[(&str, &str)]) -> Result<(), String> {
+pub fn ensure_package_json_scripts(base: &Path, scripts: &[(&str, &str)]) -> Result<(), String> {
     let package_path = base.join("package.json");
     let content = fs::read_to_string(&package_path)
         .map_err(|e| format!("Failed to read package.json for script update: {e}"))?;

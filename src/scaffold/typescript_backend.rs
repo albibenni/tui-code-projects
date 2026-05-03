@@ -10,11 +10,12 @@ pub fn scaffold(params: &ScaffoldParams, base: &Path, tx: &Sender<String>) -> Re
     let framework = params.sel("Framework").unwrap_or("");
     let pm = params.sel("Package Manager").unwrap_or("npm");
     let eslint = params.sel("ESLint").unwrap_or("None");
+    let testing = params.sel("Testing").unwrap_or("None");
 
     if runtime == "Deno" {
         scaffold_deno(params, base, framework, tx)
     } else {
-        scaffold_node_bun(params, base, framework, pm, eslint, tx)
+        scaffold_node_bun(params, base, framework, pm, eslint, testing, tx)
     }
 }
 
@@ -103,6 +104,7 @@ fn scaffold_node_bun(
     framework: &str,
     pm: &str,
     eslint: &str,
+    testing: &str,
     tx: &Sender<String>,
 ) -> Result<(), String> {
     let name = &params.project_name;
@@ -132,6 +134,10 @@ fn scaffold_node_bun(
     }
 
     dev_deps.extend_from_slice(&["typescript", "@types/node", "tsx"]);
+
+    if testing == "Vitest" {
+        dev_deps.extend_from_slice(&["vitest", "@vitest/coverage-v8"]);
+    }
 
     match eslint {
         "Recommended" => {
@@ -176,6 +182,20 @@ fn scaffold_node_bun(
         "devDependencies": {}
     });
 
+    if testing == "Vitest" {
+        if let Some(scripts_obj) = pkg.get_mut("scripts").and_then(|s| s.as_object_mut()) {
+            scripts_obj.insert("test".to_string(), serde_json::Value::String("vitest run".to_string()));
+            scripts_obj.insert(
+                "test:watch".to_string(),
+                serde_json::Value::String("vitest".to_string()),
+            );
+            scripts_obj.insert(
+                "test:coverage".to_string(),
+                serde_json::Value::String("vitest run --coverage".to_string()),
+            );
+        }
+    }
+
     if let Some(deps_obj) = pkg.get_mut("dependencies").and_then(|d| d.as_object_mut()) {
         for d in deps {
             deps_obj.insert(d.to_string(), serde_json::Value::String("latest".to_string()));
@@ -207,6 +227,13 @@ fn scaffold_node_bun(
 
     send(tx, "Writing config files...");
     writer::write_eslint_files(base, eslint, writer::EslintTarget::Backend)?;
+
+    if testing == "Vitest" {
+        use super::writer_constants;
+        writer::write_file(base, "vitest.config.ts", writer_constants::VITEST_BACKEND_CONFIG)?;
+        let test_dir = base.join("src");
+        writer::write_file(&test_dir, "index.test.ts", writer_constants::VITEST_SAMPLE_TEST)?;
+    }
 
     send(tx, "Creating src/index.ts...");
     write_entry_file(base, framework)

@@ -265,3 +265,42 @@ pub const PRETTIERRC: &str = r#"{
   "singleQuote": false
 }
 "#;
+
+pub const VITEST_BACKEND_CONFIG: &str = r#"/// <reference types="vitest" />
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    globals: false,
+    environment: "node",
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+    },
+  },
+});
+"#;
+
+pub const VITEST_FRONTEND_CONFIG: &str = r#"/// <reference types="vitest" />
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    globals: false,
+    environment: "happy-dom",
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+    },
+  },
+});
+"#;
+
+pub const VITEST_SAMPLE_TEST: &str = r#"import { describe, it, expect } from "vitest";
+
+describe("Sample Test", () => {
+  it("should add 1 + 1 correctly", () => {
+    expect(1 + 1).toBe(2);
+  });
+});
+"#;

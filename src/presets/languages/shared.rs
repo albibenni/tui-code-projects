@@ -104,19 +104,38 @@ pub fn eslint_frontend_step() -> OptionStep {
     )
 }
 
+pub fn testing_step() -> OptionStep {
+    OptionStep::single(
+        "Testing",
+        vec![
+            Choice {
+                name: "None",
+                description: "No testing framework",
+                follow_up: vec![],
+            },
+            Choice {
+                name: "Vitest",
+                description: "Fast, Vite-native testing framework",
+                follow_up: vec![],
+            },
+        ],
+    )
+}
+
 pub fn git_hooks_ts_step() -> OptionStep {
+    let testing = testing_step();
     OptionStep::single(
         "Git Hooks",
         vec![
             Choice {
                 name: "None",
                 description: "Do not configure pre-commit hooks",
-                follow_up: vec![],
+                follow_up: vec![testing.clone()],
             },
             Choice {
                 name: "Husky (lint + test)",
                 description: "Use Husky pre-commit to run lint and test",
-                follow_up: vec![],
+                follow_up: vec![testing],
             },
         ],
     )
