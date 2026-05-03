@@ -79,21 +79,33 @@ fn write_tsconfig_for_eslint(base: &Path, eslint_choice: &str) -> Result<(), Str
 }
 
 pub fn write_gitignore(base: &Path, language: &str) -> Result<(), String> {
-    let content = match language {
-        "Rust" | "Rust (Desktop)" => "/target\n",
-        "Go" | "Go (Desktop)" => "/bin\n/out\n",
-        "TypeScript (Backend)" | "TypeScript (Frontend)" | "TypeScript (Desktop)" => "node_modules\ndist\n.env\n",
-        "Java" => "/build\n/target\n.gradle\n",
-        "Python" | "Python (Desktop)" => "__pycache__/\n*.py[cod]\n*$py.class\nvenv/\n.venv/\n",
-        "Flutter" | "Kotlin (Mobile)" | "Swift (Mobile)" | "Swift" => ".DS_Store\nbuild/\n.dart_tool/\n.packages\n.pub-cache/\n.pub/\n",
-        "PHP" => "/vendor\n.env\n",
-        _ => "",
+    let mut content = match language {
+        "Rust" | "Rust (Desktop)" => "/target\n".to_string(),
+        "Go" | "Go (Desktop)" => "/bin\n/out\n".to_string(),
+        "TypeScript (Backend)" | "TypeScript (Frontend)" | "TypeScript (Desktop)" => {
+            "node_modules/\ndist/\n.npm\n*.tsbuildinfo\n".to_string()
+        }
+        "Java" => "/build/\n/target/\n.gradle/\n.settings/\n.classpath\n.project\n".to_string(),
+        "Python" | "Python (Desktop)" => {
+            "__pycache__/\n*.py[cod]\n*$py.class\nvenv/\n.venv/\n.pytest_cache/\n.coverage\nhtmlcov/\n".to_string()
+        }
+        "Flutter" | "Kotlin (Mobile)" | "Swift (Mobile)" | "Swift" => {
+            "build/\n.dart_tool/\n.packages\n.pub-cache/\n.pub/\n".to_string()
+        }
+        "PHP" => "/vendor/\n".to_string(),
+        _ => String::new(),
     };
 
-    if !content.is_empty() {
+    content.push_str("\n# OS Files\n.DS_Store\n.DS_Store?\n._*\n.Spotlight-V100\n.Trashes\nThumbs.db\nehthumbs.db\nDesktop.ini\n");
+    content.push_str("\n# IDEs and Editors\n.idea/\n.vscode/\n*.swp\n*.swo\n*.sublime-project\n*.sublime-workspace\n.history/\n.project\n.settings/\n.classpath\n");
+    content.push_str("\n# Logs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n");
+    content.push_str("\n# Environment and Secrets\n.env\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\n.env.*\n");
+    content.push_str("\n# Temporary files\n*.tmp\n*.bak\n*.swp\n");
+
+    if !content.trim().is_empty() {
         let path = base.join(".gitignore");
         if !path.exists() {
-            write_file(base, ".gitignore", content)?;
+            write_file(base, ".gitignore", &content)?;
         }
     }
     Ok(())
