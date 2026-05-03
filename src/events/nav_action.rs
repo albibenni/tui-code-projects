@@ -1,4 +1,4 @@
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 pub enum NavAction {
     Up,
@@ -19,6 +19,7 @@ impl NavAction {
             KeyCode::Enter => NavAction::Confirm,
             KeyCode::Esc | KeyCode::Char('b') => NavAction::Back,
             KeyCode::Char('q') => NavAction::Quit,
+            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => NavAction::Quit,
             _ => NavAction::Other,
         }
     }
