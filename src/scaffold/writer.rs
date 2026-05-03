@@ -78,6 +78,27 @@ fn write_tsconfig_for_eslint(base: &Path, eslint_choice: &str) -> Result<(), Str
     }
 }
 
+pub fn write_gitignore(base: &Path, language: &str) -> Result<(), String> {
+    let content = match language {
+        "Rust" | "Rust (Desktop)" => "/target\n",
+        "Go" | "Go (Desktop)" => "/bin\n/out\n",
+        "TypeScript (Backend)" | "TypeScript (Frontend)" | "TypeScript (Desktop)" => "node_modules\ndist\n.env\n",
+        "Java" => "/build\n/target\n.gradle\n",
+        "Python" | "Python (Desktop)" => "__pycache__/\n*.py[cod]\n*$py.class\nvenv/\n.venv/\n",
+        "Flutter" | "Kotlin (Mobile)" | "Swift (Mobile)" | "Swift" => ".DS_Store\nbuild/\n.dart_tool/\n.packages\n.pub-cache/\n.pub/\n",
+        "PHP" => "/vendor\n.env\n",
+        _ => "",
+    };
+
+    if !content.is_empty() {
+        let path = base.join(".gitignore");
+        if !path.exists() {
+            write_file(base, ".gitignore", content)?;
+        }
+    }
+    Ok(())
+}
+
 pub fn write_file(base: &Path, name: &str, content: &str) -> Result<(), String> {
     fs::write(base.join(name), content).map_err(|e| format!("Failed to write {name}: {e}"))
 }

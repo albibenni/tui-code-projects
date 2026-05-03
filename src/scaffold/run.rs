@@ -80,6 +80,8 @@ fn execute(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Resu
         _ => {}
     }
 
+    super::writer::write_gitignore(base, &params.language_name)?;
+
     if super::INTERRUPTED.load(Ordering::SeqCst) {
         return Err("Interrupted".to_string());
     }
