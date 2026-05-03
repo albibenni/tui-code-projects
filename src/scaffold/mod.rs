@@ -26,4 +26,4 @@ mod writer_constants;
 #[cfg(test)]
 pub(crate) use flutter::{launch_json_for, platforms_for};
 pub use params::ScaffoldParams;
-pub use run::{cleanup, run_threaded};
+pub use run::{cleanup, run_threaded, ensure_git_repo};
