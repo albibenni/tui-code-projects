@@ -1,4 +1,4 @@
-.PHONY: all build test coverage clean run check help install install-unix install-windows
+.PHONY: all build test coverage clean run check help install install-unix install-windows fmt lint clippy
 
 WIN_INSTALL_CMD = powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 
@@ -18,6 +18,15 @@ check:
 
 test:
 	cargo test
+
+fmt:
+	cargo fmt
+
+lint:
+	cargo clippy --all-targets --all-features -- -D warnings
+
+clippy:
+	cargo clippy --all-targets --all-features -- -D warnings
 
 install:
 ifeq ($(OS),Windows_NT)
@@ -51,6 +60,9 @@ help:
 	@echo "  release   Build (release)"
 	@echo "  run       Run the TUI"
 	@echo "  test      Run all tests"
+	@echo "  fmt       Format code"
+	@echo "  lint      Run lints (clippy)"
+	@echo "  clippy    Run lints (clippy)"
 	@echo "  coverage  Print per-file and total coverage (lines/regions/functions) to stdout"
 	@echo "  clean     Remove build artifacts"
 	@echo "  install   Install the binary and setup an alias (auto OS)"
