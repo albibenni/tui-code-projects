@@ -50,6 +50,9 @@ fn run(terminal: &mut ratatui::DefaultTerminal) -> io::Result<()> {
     scaffold::INTERRUPTED.store(true, std::sync::atomic::Ordering::SeqCst);
 
     if app.step == Step::Running && !app.scaffold_done {
+        if let Some(handle) = app.scaffold_handle.take() {
+            let _ = handle.join();
+        }
         cleanup(&app.config.project_path, &app.config.project_name);
         println!(
             "\nProject creation interrupted for '{}'. Cleaned up partial files.",

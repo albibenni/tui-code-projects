@@ -1,4 +1,5 @@
 use std::sync::mpsc::Receiver;
+use std::thread::JoinHandle;
 
 use ratatui::widgets::ListState;
 
@@ -44,6 +45,7 @@ pub struct App {
     pub config: ConfigState,
     // Running step
     pub scaffold_rx: Option<Receiver<String>>,
+    pub scaffold_handle: Option<JoinHandle<()>>,
     pub output_lines: Vec<String>,
     pub scaffold_done: bool,
     // Done step
@@ -73,6 +75,7 @@ impl App {
             option_list_state,
             config: ConfigState::new(),
             scaffold_rx: None,
+            scaffold_handle: None,
             output_lines: Vec::new(),
             scaffold_done: false,
             result_message: String::new(),

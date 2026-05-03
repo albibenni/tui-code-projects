@@ -29,7 +29,7 @@ impl App {
                 self.scaffold_rx = Some(rx);
                 self.step = Step::Running;
 
-                thread::spawn(move || run_threaded(params, tx));
+                self.scaffold_handle = Some(thread::spawn(move || run_threaded(params, tx)));
             }
             NavAction::Back => self.step = Step::Config,
             NavAction::Quit => self.show_quit_confirm = true,
