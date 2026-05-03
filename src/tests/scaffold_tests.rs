@@ -54,3 +54,60 @@ fn run_threaded_done_path_stays_under_selected_base() {
     let _ = fs::remove_dir_all(root.join(project_name));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn run_threaded_inits_git_for_typescript_backend() {
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("system time after UNIX_EPOCH")
+        .as_nanos();
+    let root = std::env::temp_dir().join(format!("new-project-tui-git-ts-{nonce}"));
+    fs::create_dir_all(&root).expect("create test root");
+
+    let project_name = "ts-app";
+    let params = ScaffoldParams {
+        project_path: root.display().to_string(),
+        project_name: project_name.to_string(),
+        language_name: "TypeScript (Backend)".to_string(),
+        selections: vec![
+            ("Runtime".to_string(), "Node".to_string()),
+            ("Framework".to_string(), "Express".to_string()),
+            ("Package Manager".to_string(), "npm".to_string()),
+        ],
+    };
+    
+    let _lines = run(params);
+    
+    let git_dir = root.join(project_name).join(".git");
+    assert!(git_dir.exists(), "Git repository should be initialized for TS projects");
+
+    let _ = fs::remove_dir_all(root.join(project_name));
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn run_threaded_inits_git_for_go() {
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("system time after UNIX_EPOCH")
+        .as_nanos();
+    let root = std::env::temp_dir().join(format!("new-project-tui-git-{nonce}"));
+    fs::create_dir_all(&root).expect("create test root");
+
+    let project_name = "go-app";
+    let params = ScaffoldParams {
+        project_path: root.display().to_string(),
+        project_name: project_name.to_string(),
+        language_name: "Go".to_string(),
+        selections: vec![],
+    };
+    
+    let _lines = run(params);
+    
+    let git_dir = root.join(project_name).join(".git");
+    assert!(git_dir.exists(), "Git repository should be initialized for Go projects");
+    assert!(git_dir.is_dir(), ".git should be a directory");
+
+    let _ = fs::remove_dir_all(root.join(project_name));
+    let _ = fs::remove_dir_all(root);
+}
