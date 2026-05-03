@@ -11,9 +11,9 @@ setup:
  chmod +x .git/hooks/pre-push`
 ```
 
-- [ ] Add a section on how to add new languages
+- [x] Add a section on how to add new languages
 - [x] makefile for common tasks like linting, testing, building, etc. for those who use makefiles
-- [ ] tests in typescript
+- [x] tests in typescript
 - [ ] java - add gradle
 - [x] cleanup if I quit - it goes in background
 - [x] create gitignore

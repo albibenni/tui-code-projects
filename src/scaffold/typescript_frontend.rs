@@ -58,14 +58,14 @@ fn setup_libraries(
     }
 
     if !deps.is_empty() {
-        send(tx, format!("Installing libraries: {}...", deps.join(", ")));
+        scaffold_emit(tx, format!("Installing libraries: {}...", deps.join(", ")));
         let (prog, mut args) = add_command(pm, false);
         args.extend_from_slice(&deps);
         run_in(base, prog, &args, tx)?;
     }
 
     if !dev_deps.is_empty() {
-        send(
+        scaffold_emit(
             tx,
             format!("Installing dev libraries: {}...", dev_deps.join(", ")),
         );
@@ -75,7 +75,7 @@ fn setup_libraries(
     }
 
     if libraries.contains("Tailwind CSS") {
-        send(tx, "Initializing Tailwind CSS...");
+        scaffold_emit(tx, "Initializing Tailwind CSS...");
         let (prog, args) = match pm {
             "pnpm" => ("pnpm", vec!["tailwindcss", "init", "-p"]),
             "yarn" => ("yarn", vec!["tailwindcss", "init", "-p"]),
@@ -111,7 +111,7 @@ fn scaffold_vue(
 ) -> Result<(), String> {
     match variant {
         Some("Nuxt") => {
-            send(tx, "Running nuxi init...");
+            scaffold_emit(tx, "Running nuxi init...");
             run_in(base, "npx", &["nuxi@latest", "init", ".", "--force"], tx)?;
             install_deps(base, pm, tx)
         }
@@ -127,7 +127,7 @@ fn scaffold_react(
 ) -> Result<(), String> {
     match variant {
         Some("Next.js") => {
-            send(tx, "Running create-next-app...");
+            scaffold_emit(tx, "Running create-next-app...");
             run_in(
                 base,
                 "npx",
@@ -146,7 +146,7 @@ fn scaffold_react(
             )
         }
         Some("Remix") => {
-            send(tx, "Running create-remix...");
+            scaffold_emit(tx, "Running create-remix...");
             run_in(
                 base,
                 "npx",
@@ -156,7 +156,7 @@ fn scaffold_react(
             install_deps(base, pm, tx)
         }
         Some("TanStack Start") => {
-            send(tx, "Running tanstack create...");
+            scaffold_emit(tx, "Running tanstack create...");
             run_in(
                 base,
                 "npx",
@@ -175,7 +175,7 @@ fn scaffold_react(
             )
         }
         Some("Expo") => {
-            send(tx, "Running create-expo-app...");
+            scaffold_emit(tx, "Running create-expo-app...");
             run_in(
                 base,
                 "npx",
@@ -201,7 +201,7 @@ fn scaffold_svelte(
 ) -> Result<(), String> {
     match variant {
         Some("SvelteKit") => {
-            send(tx, "Running sv create...");
+            scaffold_emit(tx, "Running sv create...");
             run_in(
                 base,
                 "npx",
@@ -223,7 +223,7 @@ fn scaffold_svelte(
 }
 
 fn scaffold_vite(base: &Path, template: &str, pm: &str, tx: &Sender<String>) -> Result<(), String> {
-    send(tx, format!("Running create-vite ({template})..."));
+    scaffold_emit(tx, format!("Running create-vite ({template})..."));
     let (prog, args): (&str, Vec<&str>) = match pm {
         "pnpm" => (
             "pnpm",
@@ -236,7 +236,15 @@ fn scaffold_vite(base: &Path, template: &str, pm: &str, tx: &Sender<String>) -> 
         ),
         _ => (
             "npm",
-            vec!["create", "vite@latest", ".", "--yes", "--", "--template", template],
+            vec![
+                "create",
+                "vite@latest",
+                ".",
+                "--yes",
+                "--",
+                "--template",
+                template,
+            ],
         ),
     };
     run_in(base, prog, &args, tx)?;
@@ -244,7 +252,7 @@ fn scaffold_vite(base: &Path, template: &str, pm: &str, tx: &Sender<String>) -> 
 }
 
 fn scaffold_angular(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
-    send(tx, "Running @angular/cli new...");
+    scaffold_emit(tx, "Running @angular/cli new...");
     run_in(
         base,
         "npx",
@@ -260,7 +268,7 @@ fn scaffold_angular(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), St
 }
 
 fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
-    send(tx, "Running create-astro...");
+    scaffold_emit(tx, "Running create-astro...");
     let (prog, args): (&str, Vec<&str>) = match pm {
         "pnpm" => (
             "pnpm",
@@ -321,7 +329,7 @@ fn scaffold_astro(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Stri
 }
 
 fn scaffold_qwik(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
-    send(tx, "Running create-qwik...");
+    scaffold_emit(tx, "Running create-qwik...");
     let (prog, args): (&str, Vec<&str>) = match pm {
         "pnpm" => (
             "pnpm",
@@ -343,7 +351,7 @@ fn scaffold_qwik(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), Strin
 
 fn install_deps(base: &Path, pm: &str, tx: &Sender<String>) -> Result<(), String> {
     let (prog, args) = install_command(pm);
-    send(tx, format!("Installing dependencies ({pm})..."));
+    scaffold_emit(tx, format!("Installing dependencies ({pm})..."));
     run_in(base, prog, &args, tx)
 }
 
@@ -356,13 +364,18 @@ fn install_command(pm: &str) -> (&str, Vec<&'static str>) {
     }
 }
 
-fn setup_default_eslint(base: &Path, pm: &str, eslint: &str, tx: &Sender<String>) -> Result<(), String> {
+fn setup_default_eslint(
+    base: &Path,
+    pm: &str,
+    eslint: &str,
+    tx: &Sender<String>,
+) -> Result<(), String> {
     let dev_deps = eslint_dev_deps(eslint);
     if dev_deps.is_empty() {
         return Ok(());
     }
 
-    send(tx, format!("Installing ESLint dev dependencies ({pm})..."));
+    scaffold_emit(tx, format!("Installing ESLint dev dependencies ({pm})..."));
     let mut args: Vec<&str> = Vec::new();
     let prog = match pm {
         "pnpm" => {
@@ -385,7 +398,7 @@ fn setup_default_eslint(base: &Path, pm: &str, eslint: &str, tx: &Sender<String>
     args.extend_from_slice(dev_deps);
     run_in(base, prog, &args, tx)?;
 
-    send(tx, "Writing ESLint/Prettier config files...");
+    scaffold_emit(tx, "Writing ESLint/Prettier config files...");
     writer::write_eslint_config_files(base, eslint, writer::EslintTarget::Frontend)
 }
 
@@ -420,7 +433,7 @@ fn setup_testing(base: &Path, pm: &str, testing: &str, tx: &Sender<String>) -> R
         return Ok(());
     }
 
-    send(tx, format!("Installing Vitest dependencies ({pm})..."));
+    scaffold_emit(tx, format!("Installing Vitest dependencies ({pm})..."));
     let mut args: Vec<&str> = Vec::new();
     let prog = match pm {
         "pnpm" => {
@@ -443,9 +456,13 @@ fn setup_testing(base: &Path, pm: &str, testing: &str, tx: &Sender<String>) -> R
     args.extend_from_slice(&["vitest", "@vitest/coverage-v8", "happy-dom"]);
     run_in(base, prog, &args, tx)?;
 
-    send(tx, "Writing Vitest config...");
+    scaffold_emit(tx, "Writing Vitest config...");
     use super::writer_constants;
-    writer::write_file(base, "vitest.config.ts", writer_constants::VITEST_FRONTEND_CONFIG)?;
+    writer::write_file(
+        base,
+        "vitest.config.ts",
+        writer_constants::VITEST_FRONTEND_CONFIG,
+    )?;
 
     // Update package.json scripts
     let scripts = &[
@@ -454,11 +471,11 @@ fn setup_testing(base: &Path, pm: &str, testing: &str, tx: &Sender<String>) -> R
         ("test:coverage", "vitest run --coverage"),
     ];
     writer::ensure_package_json_scripts(base, scripts)?;
-    
+
     Ok(())
 }
 
-fn send(tx: &Sender<String>, msg: impl Into<String>) {
+fn scaffold_emit(tx: &Sender<String>, msg: impl Into<String>) {
     let _ = tx.send(msg.into());
 }
 

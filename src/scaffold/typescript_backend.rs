@@ -31,7 +31,10 @@ fn scaffold_deno(
             imports.insert("oak".to_string(), serde_json::json!("jsr:@oak/oak"));
         }
         "Fresh" => {
-            imports.insert("$fresh/".to_string(), serde_json::json!("jsr:@fresh/fresh/"));
+            imports.insert(
+                "$fresh/".to_string(),
+                serde_json::json!("jsr:@fresh/fresh/"),
+            );
         }
         "Hono" => {
             imports.insert("hono".to_string(), serde_json::json!("jsr:@hono/hono"));
@@ -52,10 +55,10 @@ fn scaffold_deno(
     let deno_json = serde_json::to_string_pretty(&deno_json_val)
         .map_err(|e| format!("Failed to serialize deno.json: {e}"))?;
 
-    send(tx, "Writing deno.json...");
+    scaffold_emit(tx, "Writing deno.json...");
     writer::write_file(base, "deno.json", &deno_json)?;
 
-    send(tx, "Creating src/main.ts...");
+    scaffold_emit(tx, "Creating src/main.ts...");
     write_deno_entry(base, framework)
 }
 
@@ -184,39 +187,39 @@ fn scaffold_node_bun(
 
     if testing == "Vitest" {
         if let Some(scripts_obj) = pkg.get_mut("scripts").and_then(|s| s.as_object_mut()) {
-            scripts_obj.insert("test".to_string(), serde_json::Value::String("vitest run".to_string()));
-            scripts_obj.insert(
-                "test:watch".to_string(),
-                serde_json::Value::String("vitest".to_string()),
-            );
+            scripts_obj.insert("test".to_string(), serde_json::json!("vitest run"));
+            scripts_obj.insert("test:watch".to_string(), serde_json::json!("vitest"));
             scripts_obj.insert(
                 "test:coverage".to_string(),
-                serde_json::Value::String("vitest run --coverage".to_string()),
+                serde_json::json!("vitest run --coverage"),
             );
         }
     }
 
     if let Some(deps_obj) = pkg.get_mut("dependencies").and_then(|d| d.as_object_mut()) {
         for d in deps {
-            deps_obj.insert(d.to_string(), serde_json::Value::String("latest".to_string()));
+            deps_obj.insert(d.to_string(), serde_json::json!("latest"));
         }
     }
 
-    if let Some(dev_deps_obj) = pkg.get_mut("devDependencies").and_then(|d| d.as_object_mut()) {
+    if let Some(dev_deps_obj) = pkg
+        .get_mut("devDependencies")
+        .and_then(|d| d.as_object_mut())
+    {
         for d in dev_deps {
-            dev_deps_obj.insert(d.to_string(), serde_json::Value::String("latest".to_string()));
+            dev_deps_obj.insert(d.to_string(), serde_json::json!("latest"));
         }
     }
 
     let package_json = serde_json::to_string_pretty(&pkg)
         .map_err(|e| format!("Failed to serialize package.json: {e}"))?;
 
-    send(tx, "Writing package.json...");
+    scaffold_emit(tx, "Writing package.json...");
     writer::write_file(base, "package.json", &package_json)?;
 
     writer::ensure_js_linting_scripts(base, eslint)?;
 
-    send(tx, format!("Running {pm} install..."));
+    scaffold_emit(tx, format!("Running {pm} install..."));
     let (prog, args): (&str, &[&str]) = match pm {
         "pnpm" => ("pnpm", &["install"]),
         "yarn" => ("yarn", &[]),
@@ -225,17 +228,25 @@ fn scaffold_node_bun(
     };
     run_in(base, prog, args, tx)?;
 
-    send(tx, "Writing config files...");
+    scaffold_emit(tx, "Writing config files...");
     writer::write_eslint_files(base, eslint, writer::EslintTarget::Backend)?;
 
     if testing == "Vitest" {
         use super::writer_constants;
-        writer::write_file(base, "vitest.config.ts", writer_constants::VITEST_BACKEND_CONFIG)?;
+        writer::write_file(
+            base,
+            "vitest.config.ts",
+            writer_constants::VITEST_BACKEND_CONFIG,
+        )?;
         let test_dir = base.join("src");
-        writer::write_file(&test_dir, "index.test.ts", writer_constants::VITEST_SAMPLE_TEST)?;
+        writer::write_file(
+            &test_dir,
+            "index.test.ts",
+            writer_constants::VITEST_SAMPLE_TEST,
+        )?;
     }
 
-    send(tx, "Creating src/index.ts...");
+    scaffold_emit(tx, "Creating src/index.ts...");
     write_entry_file(base, framework)
 }
 
@@ -310,6 +321,6 @@ await app.listen(3000);
     writer::write_file(&src, "index.ts", content)
 }
 
-fn send(tx: &Sender<String>, msg: impl Into<String>) {
+fn scaffold_emit(tx: &Sender<String>, msg: impl Into<String>) {
     let _ = tx.send(msg.into());
 }
