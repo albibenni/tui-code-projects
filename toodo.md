@@ -12,8 +12,8 @@ setup:
 ```
 
 - [ ] Add a section on how to add new languages
-- [ ] makefile for common tasks like linting, testing, building, etc. for those who use makefiles
+- [x] makefile for common tasks like linting, testing, building, etc. for those who use makefiles
 - [ ] tests in typescript
 - [ ] java - add gradle
-- [ ] cleanup if I quit - it goes in background
-- [ ] create gitignore
+- [x] cleanup if I quit - it goes in background
+- [x] create gitignore
