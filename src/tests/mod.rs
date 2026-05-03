@@ -4,6 +4,7 @@ mod confirm_tests;
 mod done_tests;
 mod events_tests;
 mod flutter_tests;
+mod git_tests;
 mod languages_tests;
 mod scaffold_tests;
 mod theme_tests;

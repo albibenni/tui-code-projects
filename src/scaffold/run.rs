@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
 use std::sync::mpsc::Sender;
 
 use crate::config::validate_project_name;
@@ -92,36 +91,21 @@ fn execute(params: &ScaffoldParams, base: &PathBuf, tx: &Sender<String>) -> Resu
     Ok(())
 }
 
-fn ensure_git_repo(base: &PathBuf, tx: &Sender<String>) {
+pub fn ensure_git_repo(base: &Path, tx: &Sender<String>) {
     if base.join(".git").exists() {
         return;
     }
 
     if !super::command::command_exists("git") {
-        let _ = tx.send("Warning: `git` command not found. Skipping git initialization.".to_string());
+        let _ = tx.send("Warning: `git` command not found in PATH. Skipping git initialization.".to_string());
         return;
     }
 
     let _ = tx.send("Initializing git repository...".to_string());
-
-    match Command::new("git")
-        .arg("init")
-        .arg("-q")
-        .current_dir(base)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-    {
-        Ok(status) if status.success() => {}
-        Ok(status) => {
-            let _ = tx.send(format!(
-                "Warning: `git init` failed with exit code {:?}",
-                status.code()
-            ));
-        }
-        Err(e) => {
-            let _ = tx.send(format!("Warning: failed to run `git init`: {e}"));
-        }
+    if let Err(e) = super::command::run_in(base, "git", &["init", "-q"], tx) {
+        let _ = tx.send(format!("Warning: git initialization failed: {e}"));
+    } else {
+        let _ = tx.send("Git repository initialized successfully.".to_string());
     }
 }
 
@@ -138,7 +122,7 @@ fn apply_git_hooks(base: &Path, params: &ScaffoldParams, tx: &Sender<String>) {
 
     match hook_choice {
         "Husky (lint + test)" => {
-            if let Err(e) = setup_husky_hook(base, params) {
+            if let Err(e) = setup_husky_hook(base, params, tx) {
                 let _ = tx.send(format!("Warning: failed to setup Husky hook: {e}"));
             }
         }
@@ -156,7 +140,7 @@ fn apply_git_hooks(base: &Path, params: &ScaffoldParams, tx: &Sender<String>) {
     }
 }
 
-fn setup_husky_hook(base: &Path, params: &ScaffoldParams) -> Result<(), String> {
+fn setup_husky_hook(base: &Path, params: &ScaffoldParams, tx: &Sender<String>) -> Result<(), String> {
     let husky_dir = base.join(".husky");
     fs::create_dir_all(&husky_dir).map_err(|e| format!("Failed to create .husky/: {e}"))?;
 
@@ -184,22 +168,7 @@ fi
 
     write_executable(&husky_dir.join("pre-commit"), &script)?;
 
-    let status = Command::new("git")
-        .args(["config", "core.hooksPath", ".husky"])
-        .current_dir(base)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .map_err(|e| format!("Failed to run `git config core.hooksPath .husky`: {e}"))?;
-
-    if status.success() {
-        Ok(())
-    } else {
-        Err(format!(
-            "`git config core.hooksPath .husky` failed with {:?}",
-            status.code()
-        ))
-    }
+    super::command::run_in(base, "git", &["config", "core.hooksPath", ".husky"], tx)
 }
 
 fn setup_native_hook(base: &Path) -> Result<(), String> {
